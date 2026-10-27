@@ -29,7 +29,7 @@ Both cards follow the language of Home Assistant: English, or Italian when Home 
 
 ### Manual
 
-1. Download `homeray-cards.js` from the [latest release](https://github.com/AndreaGuarducci/homeray-cards/releases) and copy it to `/config/www/`.
+1. Download [`homeray-cards.js`](https://github.com/AndreaGuarducci/homeray-cards/raw/main/homeray-cards.js) and copy it to `/config/www/`.
 2. Settings → Dashboards → three dots → **Resources** → **Add resource**: URL `/local/homeray-cards.js?v=1.0.0`, type **JavaScript module**.
 3. Reload the page (Ctrl+Shift+R). The browser console shows `HOMERAY 1.0.0`.
 
