@@ -83,7 +83,7 @@ Want to see your whole home network, floor by floor? **Homeray Pro** adds the ho
 
 ![Homeray Pro home map](images/homeray-pro-map.png)
 
-Homeray Pro also includes a dark theme, a ready-made system dashboard, a demo mode with fake data and a full guide. → **[homeray.app](https://homeray.app)**
+Homeray Pro speaks English and Italian, and also includes a dark theme, a ready-made system dashboard, a demo mode with fake data and a full guide. → **[homeray.app](https://homeray.app)**
 
 ## License
 

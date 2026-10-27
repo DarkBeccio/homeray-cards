@@ -77,9 +77,9 @@ Quattro anelli da 3 colonne stanno su una riga.
 
 Vuoi vedere tutta la rete di casa, piano per piano? **Homeray Pro** aggiunge la mappa della casa: l'edificio disegnato a spaccato, con router, switch e access point nella loro stanza, i cavi e le powerline, lo stato in tempo reale e la scheda di ogni apparato. Si disegna da sola a partire dall'elenco dei piani e dei collegamenti.
 
-![Mappa della casa di Homeray Pro](images/homeray-pro-map.png)
+![Mappa della casa di Homeray Pro](images/homeray-pro-map-it.png)
 
-Homeray Pro comprende anche un tema scuro, una dashboard di sistema pronta, la modalità demo con dati finti e la guida completa. → **[homeray.app](https://homeray.app)**
+Homeray Pro è in italiano e in inglese e comprende anche un tema scuro, una dashboard di sistema pronta, la modalità demo con dati finti e la guida completa. → **[homeray.app](https://homeray.app)**
 
 ## Licenza
 
