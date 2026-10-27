@@ -1,5 +1,5 @@
 /*!
- * Homeray v1.0.0 - an X-ray of your home in Home Assistant
+ * Homeray v1.0.1 - an X-ray of your home in Home Assistant
  * homeray-issues-card (issues dashboard) and homeray-gauge-card (ring gauge)
  * https://github.com/AndreaGuarducci/homeray-cards - MIT License - (c) 2026 Andrea Guarducci
  * Want the home network map? Homeray Pro: https://homeray.app
@@ -19,7 +19,7 @@ const I18N={
   why:{setup_error:'setup failed',setup_retry:'unreachable, retrying',setup_in_progress:'unreachable, retrying',not_loaded:'not loaded',failed_unload:'stuck',migration_error:'migration error'},
   stDev:n=>pl(n,'device not responding','devices not responding'),stInt:n=>pl(n,'integration stopped','integrations stopped'),stUpd:n=>pl(n,'update pending','updates pending'),stBat:n=>pl(n,'low battery','low batteries'),
   pDev:'Devices not responding',pInt:'Stopped integrations',pUpd:'Pending updates',pBat:x=>'Batteries below '+x+'%',
-  eDev:'All devices are responding',eInt:'All integrations are running',eUpd:'No pending updates',eBat:'No low batteries',
+  eDev:'All devices are responding',iLoad:'Checking integrations…',iErr:'Could not read the integrations',iStale:'Last check failed: showing the previous result',partial:'Check incomplete',iSub:' Integrations could not be checked.',low:'low',eInt:'All integrations are running',eUpd:'No pending updates',eBat:'No low batteries',
   title:t=>t?t+pl(t,' thing to check',' things to check'):'All good',
   sub:d=>{const p=[];if(d.dev.length)p.push(d.dev.length+pl(d.dev.length,' device is not responding',' devices are not responding'));if(d.integ.length)p.push(d.integ.length+pl(d.integ.length,' integration is stopped',' integrations are stopped'));if(d.upd.length)p.push(d.upd.length+pl(d.upd.length,' update pending',' updates pending'));if(d.bat.length)p.push(d.bat.length+pl(d.bat.length,' low battery',' low batteries'));
    if(!p.length)return'Devices, integrations, updates and batteries are all fine.';const ok=[];if(!d.upd.length)ok.push('updates');if(!d.bat.length)ok.push('batteries');
@@ -28,7 +28,7 @@ const I18N={
   why:{setup_error:'configurazione non riuscita',setup_retry:'non raggiungibile, riprova da sola',setup_in_progress:'non raggiungibile, riprova da sola',not_loaded:'non caricata',failed_unload:'bloccata',migration_error:'errore di aggiornamento'},
   stDev:n=>pl(n,'dispositivo non risponde','dispositivi non rispondono'),stInt:n=>pl(n,'integrazione ferma','integrazioni ferme'),stUpd:n=>pl(n,'aggiornamento in attesa','aggiornamenti in attesa'),stBat:n=>pl(n,'batteria scarica','batterie scariche'),
   pDev:'Dispositivi che non rispondono',pInt:'Integrazioni ferme',pUpd:'Aggiornamenti in attesa',pBat:x=>'Batterie sotto il '+x+'%',
-  eDev:'Tutti i dispositivi rispondono',eInt:'Tutte le integrazioni sono attive',eUpd:'Nessun aggiornamento in attesa',eBat:'Nessuna batteria scarica',
+  eDev:'Tutti i dispositivi rispondono',iLoad:'Verifica delle integrazioni in corso…',iErr:'Stato delle integrazioni non disponibile',iStale:'Ultima verifica non riuscita: risultato precedente',partial:'Verifica incompleta',iSub:' Non è stato possibile verificare le integrazioni.',low:'scarica',eInt:'Tutte le integrazioni sono attive',eUpd:'Nessun aggiornamento in attesa',eBat:'Nessuna batteria scarica',
   title:t=>t?t+pl(t,' cosa da controllare',' cose da controllare'):'Tutto a posto',
   sub:d=>{const p=[];if(d.dev.length)p.push(d.dev.length+pl(d.dev.length,' dispositivo non risponde',' dispositivi non rispondono'));if(d.integ.length)p.push(d.integ.length===1?"un'integrazione è ferma":d.integ.length+' integrazioni sono ferme');if(d.upd.length)p.push(d.upd.length+pl(d.upd.length,' aggiornamento in attesa',' aggiornamenti in attesa'));if(d.bat.length)p.push(d.bat.length+pl(d.bat.length,' batteria scarica',' batterie scariche'));
    if(!p.length)return'Dispositivi, integrazioni, aggiornamenti e batterie sono a posto.';const ok=[];if(!d.upd.length)ok.push('aggiornamenti');if(!d.bat.length)ok.push('batterie');
@@ -41,6 +41,7 @@ const go=p=>{history.pushState(null,'',p);window.dispatchEvent(new CustomEvent('
 /* ---------- ring gauge ---------- */
 const ACSS=`
 :host{display:block;height:100%}
+ha-card:focus-visible{outline:3px solid var(--primary-color);outline-offset:2px}
 ha-card{height:100%;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 8px 12px;cursor:pointer}
 svg{width:100%;max-width:138px;height:auto;display:block}
 .bg{fill:none;stroke:var(--divider-color,#ddd);stroke-width:9;stroke-linecap:round}
@@ -52,11 +53,18 @@ svg{width:100%;max-width:138px;height:auto;display:block}
 const R=42,CIRC=2*Math.PI*R,ARC=CIRC*0.75;
 class CasaAnelloCard extends HTMLElement{
   setConfig(c){
-    if(!c||!c.entity)throw new Error('homeray-gauge-card: serve "entity"');
-    this._c=c;
+    if(!c||!c.entity)throw new Error('homeray-gauge-card: "entity" is required');
+    const num=(k,d)=>{if(c[k]==null||c[k]==='')return d;const n=Number(c[k]);if(!Number.isFinite(n))throw new Error('homeray-gauge-card: "'+k+'" must be a number');return n};
+    const min=num('min',0),max=num('max',100);
+    if(!(max>min))throw new Error('homeray-gauge-card: "max" must be greater than "min"');
+    const dec=num('decimals',null);
+    if(dec!=null&&!(Number.isInteger(dec)&&dec>=0&&dec<=6))throw new Error('homeray-gauge-card: "decimals" must be a whole number from 0 to 6');
+    this._c=Object.assign({},c,{min,max,warn:num('warn',null),bad:num('bad',null),decimals:dec});
     if(!this.shadowRoot)this.attachShadow({mode:'open'});
-    this.shadowRoot.innerHTML='<style>'+ACSS+'</style><ha-card><svg viewBox="0 0 100 92" role="img"><circle class="bg" cx="50" cy="50" r="'+R+'" stroke-dasharray="'+ARC+' '+CIRC+'" transform="rotate(135 50 50)"/><circle class="fg" cx="50" cy="50" r="'+R+'" stroke="'+MUTE+'" stroke-dasharray="0 '+CIRC+'" transform="rotate(135 50 50)"/><text class="v" x="50" y="56" text-anchor="middle"></text><text class="u" x="50" y="72" text-anchor="middle"></text></svg><div class="n"></div></ha-card>';
-    this.shadowRoot.querySelector('ha-card').addEventListener('click',()=>this.dispatchEvent(new CustomEvent('hass-more-info',{bubbles:true,composed:true,detail:{entityId:this._c.entity}})));
+    this.shadowRoot.innerHTML='<style>'+ACSS+'</style><ha-card role="button" tabindex="0"><svg viewBox="0 0 100 92" aria-hidden="true"><circle class="bg" cx="50" cy="50" r="'+R+'" stroke-dasharray="'+ARC+' '+CIRC+'" transform="rotate(135 50 50)"/><circle class="fg" cx="50" cy="50" r="'+R+'" stroke="'+MUTE+'" stroke-dasharray="0 '+CIRC+'" transform="rotate(135 50 50)"/><text class="v" x="50" y="56" text-anchor="middle"></text><text class="u" x="50" y="72" text-anchor="middle"></text></svg><div class="n"></div></ha-card>';
+    const card=this.shadowRoot.querySelector('ha-card'),open=()=>this.dispatchEvent(new CustomEvent('hass-more-info',{bubbles:true,composed:true,detail:{entityId:this._c.entity}}));
+    card.addEventListener('click',open);
+    card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}});
     this._upd();
   }
   set hass(h){this._h=h;this._upd()}
@@ -66,8 +74,8 @@ class CasaAnelloCard extends HTMLElement{
     const c=this._c,sr=this.shadowRoot;if(!c||!sr)return;
     const L=langOf(this._h),T=I18N[L];
     const st=this._h&&this._h.states[c.entity];
-    const v=st?parseFloat(st.state):NaN,ok=!isNaN(v);
-    const min=c.min||0,max=c.max!=null?c.max:100;
+    const raw=st?String(st.state).trim():'',v=raw===''?NaN:Number(raw),ok=Number.isFinite(v);
+    const min=c.min,max=c.max;
     const f=ok?Math.max(0,Math.min(1,(v-min)/(max-min))):0;
     /* invert: high values are good (e.g. days left): red below "bad", orange below "warn" */
     const k=!ok?MUTE:(c.invert?(c.bad!=null&&v<=c.bad?BAD:(c.warn!=null&&v<=c.warn?WARN:OK)):(c.bad!=null&&v>=c.bad?BAD:(c.warn!=null&&v>=c.warn?WARN:OK)));
@@ -76,9 +84,9 @@ class CasaAnelloCard extends HTMLElement{
     const dec=c.decimals!=null?c.decimals:(ok&&Math.abs(v)<10?1:0);
     sr.querySelector('.v').textContent=ok?v.toLocaleString(L,{maximumFractionDigits:dec,minimumFractionDigits:0}):'—';
     sr.querySelector('.u').textContent=c.unit!=null?c.unit:(st&&st.attributes.unit_of_measurement||'');
-    const name=c.name||(st&&st.attributes.friendly_name)||c.entity;
+    const name=c.name||(st&&st.attributes.friendly_name)||c.entity,unit=sr.querySelector('.u').textContent;
     sr.querySelector('.n').textContent=name;
-    sr.querySelector('svg').setAttribute('aria-label',name+': '+(ok?v:T.na));
+    sr.querySelector('ha-card').setAttribute('aria-label',name+': '+(ok?sr.querySelector('.v').textContent+(unit?' '+unit:''):T.na));
   }
 }
 if(!customElements.get('homeray-gauge-card'))customElements.define('homeray-gauge-card',CasaAnelloCard);
@@ -120,6 +128,7 @@ const PCSS=`
 .r .d ha-icon{--mdc-icon-size:20px;display:flex}
 .r .nm{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .r .sb{margin-left:auto;padding-left:10px;font-size:.92rem;color:var(--secondary-text-color);text-align:right;flex:none;max-width:55%}
+.note{padding:8px 16px;font-size:.88rem;color:var(--secondary-text-color);background:rgba(127,127,127,.08)}
 .ok{display:flex;align-items:center;gap:10px;padding:14px 16px;color:var(--secondary-text-color);font-weight:600}
 .more{all:unset;display:block;box-sizing:border-box;width:100%;padding:10px 16px;text-align:center;font-weight:700;color:var(--primary-color);cursor:pointer;border-top:1px solid var(--divider-color,#ddd)}
 .more:hover{background:rgba(127,127,127,.09)}
@@ -129,22 +138,30 @@ const PCSS=`
 `;
 class CasaProblemiCard extends HTMLElement{
   setConfig(c){
-    this._c=c||{};this._open={};this._entries=null;this._sig=null;
+    c=c||{};
+    const bat=c.battery==null||c.battery===''?20:Number(c.battery);
+    if(!Number.isFinite(bat)||bat<0||bat>100)throw new Error('homeray-issues-card: "battery" must be a number from 0 to 100');
+    const rows=c.rows==null||c.rows===''?7:Number(c.rows);
+    if(!Number.isInteger(rows)||rows<1)throw new Error('homeray-issues-card: "rows" must be a whole number of 1 or more');
+    this._c=c;this._bat=bat;this._rows=rows;this._open={};this._sig=null;
+    /* integration results survive config edits: null = not loaded yet */
+    if(this._entries===undefined){this._entries=null;this._entErr=false}
     if(!this.shadowRoot){
       this.attachShadow({mode:'open'});
       this.shadowRoot.addEventListener('click',e=>this._act(e.target));
       this.shadowRoot.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('.r')){e.preventDefault();this._act(e.target)}});
     }
+    if(this._h)this._draw();
   }
   connectedCallback(){clearInterval(this._iv);this._iv=setInterval(()=>this._tick(),60000);this._tick()}
-  disconnectedCallback(){clearInterval(this._iv)}
+  disconnectedCallback(){clearInterval(this._iv);this._iv=null;clearTimeout(this._tm);this._tm=null}
   set hass(h){const first=!this._h;this._h=h;if(first)this._tick();if(!this._tm)this._tm=setTimeout(()=>{this._tm=null;this._draw()},first?0:2000)}
   getCardSize(){return 10}
   getGridOptions(){return{columns:'full',rows:'auto'}}
   async _tick(){
     if(!this._h)return;
-    try{this._entries=await this._h.callWS({type:'config_entries/get'})}catch(e){if(!this._entries)this._entries=[]}
-    this._draw();
+    try{const r=await this._h.callWS({type:'config_entries/get'});this._entries=Array.isArray(r)?r:[];this._entErr=false}catch(e){this._entErr=true}
+    if(this.isConnected)this._draw();
   }
   _act(el){
     if(!el||!el.closest)return;
@@ -155,13 +172,15 @@ class CasaProblemiCard extends HTMLElement{
     if(ent)this.dispatchEvent(new CustomEvent('hass-more-info',{bubbles:true,composed:true,detail:{entityId:ent}}));else if(nav)go(nav);
   }
   _data(){
-    const T=this._t,h=this._h,lab=this._c.exclude_label||'fuori_monitoraggio',lim=this._c.battery||20;
+    const T=this._t,h=this._h,lab=this._c.exclude_label||'fuori_monitoraggio',lim=this._bat;
+    const ents=h.entities||{},devs=h.devices||{},skip=new Set();
+    for(const d in devs)if((devs[d].labels||[]).includes(lab))skip.add(d);
     const byDev={};
     for(const id in (h.entities||{})){const e=h.entities[id];if(e.device_id)(byDev[e.device_id]=byDev[e.device_id]||[]).push(id)}
     const dev=[];
     for(const d in byDev){
       const dv=(h.devices||{})[d];if(!dv||dv.disabled_by)continue;
-      if((dv.labels||[]).includes(lab))continue;
+      if(skip.has(d))continue;
       let un=0,alive=0,dom='';
       for(const id of byDev[d]){const s=h.states[id];if(!s)continue;if(s.state==='unavailable'){un++;if(!dom||id.startsWith('light.')||id.startsWith('camera.'))dom=id.split('.')[0]}else if(s.state!=='unknown')alive++}
       if(un>0&&alive===0){
@@ -170,17 +189,24 @@ class CasaProblemiCard extends HTMLElement{
       }
     }
     dev.sort((a,b)=>(a.sub||'~').localeCompare(b.sub||'~')||a.name.localeCompare(b.name,this._lc,{numeric:true}));
+    const ist=this._entries===null?(this._entErr?'err':'load'):(this._entErr?'stale':'ok');
     const integ=(this._entries||[]).filter(e=>e.state!=='loaded'&&!e.disabled_by&&e.source!=='ignore').map(e=>({nav:'/config/integrations/integration/'+e.domain,name:pretty(e.domain)+(e.title&&e.title.indexOf('@')<0&&e.title.toLowerCase()!==e.domain?' · '+e.title:''),sub:T.why[e.state]||e.state,icon:'mdi:puzzle-remove'}));
-    const upd=[],bat=[];
+    const upd=[],bat=[],low=[],batDev=new Set();
     for(const id in h.states){
-      const s=h.states[id];
+      const s=h.states[id],dv=ents[id]&&ents[id].device_id;
+      if(dv&&skip.has(dv))continue;
       if(id.startsWith('update.')){if(s.state==='on')upd.push({ent:id,name:s.attributes.friendly_name||id,sub:(s.attributes.installed_version||'?')+' → '+(s.attributes.latest_version||'?'),icon:'mdi:package-up'})}
-      else if(id.startsWith('sensor.')&&s.attributes.device_class==='battery'){const v=parseFloat(s.state);if(!isNaN(v)&&v<lim)bat.push({ent:id,name:s.attributes.friendly_name||id,sub:Math.round(v)+'%',icon:'mdi:battery-alert-variant-outline'})}
+      else if(id.startsWith('sensor.')&&s.attributes.device_class==='battery'){const v=String(s.state).trim()===''?NaN:Number(s.state);if(Number.isFinite(v)&&v<lim){bat.push({ent:id,name:s.attributes.friendly_name||id,sub:Math.round(v)+'%',icon:'mdi:battery-alert-variant-outline'});if(dv)batDev.add(dv)}}
+      /* binary battery sensors: "on" means low */
+      else if(id.startsWith('binary_sensor.')&&s.attributes.device_class==='battery'&&s.state==='on')low.push({ent:id,dv,name:s.attributes.friendly_name||id,sub:T.low,icon:'mdi:battery-alert-variant-outline'});
     }
-    return{dev,integ,upd,bat};
+    /* a device already listed with its percentage is not counted twice */
+    for(const x of low)if(!x.dv||!batDev.has(x.dv))bat.push({ent:x.ent,name:x.name,sub:x.sub,icon:x.icon});
+    return{dev,integ,upd,bat,ist};
   }
   /* summary tile: neutral glass; colour lives in the icon circle, solid when there is something to look at */
   _stat(n,lab,icon,level){
+    if(n==null){const t=MUTE;return'<div class="st gl"><span class="ic" style="background:'+t+'33;color:'+t+'"><ha-icon icon="mdi:help-circle-outline"></ha-icon></span><div class="tx"><div class="num">–</div><div class="lab">'+lab+'</div></div></div>'}
     const lv=n===0?'ok':level,t=TONE[lv][this._k];
     const chip=n===0?'background:'+t+(this._k?'33':'24')+';color:'+t:'background:'+SOLID[lv]+';color:#fff';
     return'<div class="st gl'+(n===0?'':' alert')+'"'+(n===0?'':' style="border-color:'+t+'"')+'><span class="ic" style="'+chip+'"><ha-icon icon="'+(n===0?'mdi:check-circle-outline':icon)+'"></ha-icon></span><div class="tx"><div class="num">'+n+'</div><div class="lab">'+lab+'</div></div></div>';
@@ -190,20 +216,22 @@ class CasaProblemiCard extends HTMLElement{
     const bad=d.dev.length+d.integ.length,warn=d.upd.length+d.bat.length,tot=bad+warn;
     const all=Math.max(tot,1),pb=tot?Math.round(bad/all*100):0,pw=tot?Math.round(warn/all*100):0;
     const ring='<div class="dial"><svg viewBox="0 0 96 96" aria-hidden="true"><circle cx="48" cy="48" r="40" fill="none" stroke="var(--divider-color,#2a2a2a)" stroke-width="9"/>'+(tot?'<circle cx="48" cy="48" r="40" fill="none" stroke="#FF6B7A" stroke-width="9" stroke-linecap="round" pathLength="100" stroke-dasharray="'+Math.max(pb-2,0)+' 100"/>'+(pw?'<circle cx="48" cy="48" r="40" fill="none" stroke="#FFB547" stroke-width="9" stroke-linecap="round" pathLength="100" stroke-dasharray="'+Math.max(pw-2,0)+' 100" stroke-dashoffset="-'+pb+'"/>':''):'<circle cx="48" cy="48" r="40" fill="none" stroke="#3EE08F" stroke-width="9" pathLength="100" stroke-dasharray="100 100"/>')+'</svg><div class="vv">'+(tot||'✓')+'</div></div>';
-    const T=this._t,sub=T.sub(d);
+    const T=this._t,part=d.ist==='load'||d.ist==='err',sub=part?(tot?T.sub(d)+T.iSub:(d.ist==='load'?T.iLoad:T.iErr)):T.sub(d);
+    if(part&&!tot)return'<div class="hero">'+ring.replace('#3EE08F',MUTE).replace('✓','?')+'<div class="ht"><div class="bg">'+esc(T.partial)+'</div><div class="hs">'+esc(sub)+'</div></div></div>';
     const by={};for(const x of d.dev){const k=x.sub||T.noRoom;by[k]=(by[k]||0)+1}
     const keys=Object.keys(by).sort((a,b)=>by[b]-by[a]),top=keys.slice(0,3),rest=keys.slice(3).reduce((s,k)=>s+by[k],0);
     let chips='';for(const k of top)chips+='<span class="chip"><b>'+by[k]+'</b> '+esc(k)+'</span>';
     if(rest)chips+='<span class="chip"><b>'+rest+'</b>'+esc(T.otherRooms)+'</span>';
     return'<div class="hero '+(tot?'bad':'good')+'">'+ring+'<div class="ht"><div class="bg">'+esc(T.title(tot))+'</div><div class="hs">'+esc(sub)+'</div>'+(chips?'<div class="chips">'+chips+'</div>':'')+'</div></div>';
   }
-  _panel(key,title,icon,items,level,empty){
-    const open=!!this._open[key],max=this._c.rows||7,show=open?items:items.slice(0,max),t=TONE[level][this._k];
+  _panel(key,title,icon,items,level,empty,note,unknown){
+    const open=!!this._open[key],max=this._rows,show=open?items:items.slice(0,max),t=TONE[level][this._k];
     let rows='';
     for(const it of show)rows+='<div class="r" role="button" tabindex="0" data-nav="'+esc(it.nav||'')+'" data-ent="'+esc(it.ent||'')+'"><span class="d" style="background:'+t+(this._k?'33':'24')+';color:'+t+'"><ha-icon icon="'+it.icon+'"></ha-icon></span><span class="nm">'+esc(it.name)+'</span><span class="sb">'+esc(it.sub||'')+'</span></div>';
-    if(!items.length)rows='<div class="ok"><ha-icon icon="mdi:check-circle" style="color:'+TONE.ok[this._k]+'"></ha-icon>'+empty+'</div>';
+    if(!items.length)rows=unknown?'<div class="ok"><ha-icon icon="mdi:help-circle-outline" style="color:'+MUTE+'"></ha-icon>'+esc(empty)+'</div>':'<div class="ok"><ha-icon icon="mdi:check-circle" style="color:'+TONE.ok[this._k]+'"></ha-icon>'+empty+'</div>';
+    if(note)rows='<div class="note">'+esc(note)+'</div>'+rows;
     const more=items.length>max?'<button class="more" type="button" data-more="'+key+'">'+(open?this._t.less:this._t.all(items.length))+'</button>':'';
-    return'<div class="p gl"><div class="ph"><ha-icon icon="'+icon+'"></ha-icon>'+title+'<span class="c" style="background:'+(items.length?SOLID[level]:SOLID.ok)+'">'+items.length+'</span></div>'+rows+more+'</div>';
+    return'<div class="p gl"><div class="ph"><ha-icon icon="'+icon+'"></ha-icon>'+title+'<span class="c" style="background:'+(unknown?MUTE:(items.length?SOLID[level]:SOLID.ok))+'">'+(unknown?'–':items.length)+'</span></div>'+rows+more+'</div>';
   }
   _draw(){
     if(!this._h||!this.shadowRoot)return;
@@ -215,8 +243,8 @@ class CasaProblemiCard extends HTMLElement{
     if(sig===this._sig)return;this._sig=sig;
     const v=flat?{'--g':'var(--ha-card-background,#111A2C)','--bd':'var(--ha-card-border-color,#1F2A40)','--cb':'rgba(255,255,255,.04)','--hb':'#161526','--hbd':'#3A2236','--gb':'#0F1F1B','--gbd':'#1D3B31'}:{'--g':dk?'rgba(255,255,255,.07)':'rgba(255,255,255,.46)','--bd':dk?'rgba(234,235,238,.22)':'rgba(255,255,255,.6)','--cb':dk?'rgba(255,255,255,.06)':'rgba(255,255,255,.5)','--hb':dk?'rgba(255,107,122,.08)':'rgba(255,255,255,.5)','--hbd':dk?'rgba(255,107,122,.3)':'rgba(194,74,48,.35)','--gb':dk?'rgba(62,224,143,.08)':'rgba(255,255,255,.5)','--gbd':dk?'rgba(62,224,143,.3)':'rgba(46,125,79,.35)'};
     for(const k in v)this.style.setProperty(k,v[k]);
-    const stats=this._stat(d.dev.length,T.stDev(d.dev.length),'mdi:lan-disconnect','bad')+this._stat(d.integ.length,T.stInt(d.integ.length),'mdi:puzzle-remove','bad')+this._stat(d.upd.length,T.stUpd(d.upd.length),'mdi:package-up','warn')+this._stat(d.bat.length,T.stBat(d.bat.length),'mdi:battery-alert-variant-outline','warn');
-    const cols=this._panel('dev',T.pDev,'mdi:lan-disconnect',d.dev,'bad',T.eDev)+'<div class="stack">'+this._panel('integ',T.pInt,'mdi:puzzle-remove',d.integ,'bad',T.eInt)+this._panel('upd',T.pUpd,'mdi:package-up',d.upd,'warn',T.eUpd)+this._panel('bat',T.pBat(this._c.battery||20),'mdi:battery-alert-variant-outline',d.bat,'warn',T.eBat)+'</div>';
+    const stats=this._stat(d.dev.length,T.stDev(d.dev.length),'mdi:lan-disconnect','bad')+this._stat(d.ist==='load'||d.ist==='err'?null:d.integ.length,T.stInt(d.ist==='load'||d.ist==='err'?2:d.integ.length),'mdi:puzzle-remove','bad')+this._stat(d.upd.length,T.stUpd(d.upd.length),'mdi:package-up','warn')+this._stat(d.bat.length,T.stBat(d.bat.length),'mdi:battery-alert-variant-outline','warn');
+    const cols=this._panel('dev',T.pDev,'mdi:lan-disconnect',d.dev,'bad',T.eDev)+'<div class="stack">'+this._panel('integ',T.pInt,'mdi:puzzle-remove',d.integ,'bad',d.ist==='load'?T.iLoad:(d.ist==='err'?T.iErr:T.eInt),d.ist==='stale'?T.iStale:'',d.ist==='load'||d.ist==='err')+this._panel('upd',T.pUpd,'mdi:package-up',d.upd,'warn',T.eUpd)+this._panel('bat',T.pBat(this._bat),'mdi:battery-alert-variant-outline',d.bat,'warn',T.eBat)+'</div>';
     this.shadowRoot.innerHTML='<style>'+PCSS+'</style>'+((this._c.summary||this._c.riepilogo)?this._hero(d):'')+'<div class="stats">'+stats+'</div><div class="cols">'+cols+'</div>';
   }
 }
@@ -225,4 +253,4 @@ window.customCards=window.customCards||[];
 window.customCards.push({type:'homeray-issues-card',name:'Homeray Issues Card',description:'Issues dashboard: devices, integrations, updates, batteries'},{type:'homeray-gauge-card',name:'Homeray Gauge Card',description:'Ring gauge with colour thresholds'});
 
 })();
-console.info("%c HOMERAY %c 1.0.0 ","background:#3DD9F5;color:#0A0F1C;font-weight:700","background:#111A2C;color:#E8EEF8");
+console.info("%c HOMERAY %c 1.0.1 ","background:#3DD9F5;color:#0A0F1C;font-weight:700","background:#111A2C;color:#E8EEF8");

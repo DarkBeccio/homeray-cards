@@ -26,8 +26,8 @@ Le card usano la lingua di Home Assistant: italiano se Home Assistant è in ital
 ### A mano
 
 1. Scarica [`homeray-cards.js`](https://github.com/AndreaGuarducci/homeray-cards/raw/main/homeray-cards.js) e copialo in `/config/www/`.
-2. Impostazioni → Dashboard → tre puntini → **Risorse** → **Aggiungi risorsa**: URL `/local/homeray-cards.js?v=1.0.0`, tipo **Modulo JavaScript**.
-3. Ricarica la pagina (Ctrl+Maiusc+R). Nella console del browser compare `HOMERAY 1.0.0`.
+2. Impostazioni → Dashboard → tre puntini → **Risorse** → **Aggiungi risorsa**: URL `/local/homeray-cards.js?v=1.0.1`, tipo **Modulo JavaScript**.
+3. Ricarica la pagina (Ctrl+Maiusc+R). Nella console del browser compare `HOMERAY 1.0.1`.
 
 ## Quadro dei problemi
 
@@ -41,11 +41,11 @@ dark: true
 | --- | --- | --- |
 | `summary` | `false` | Mostra il riepilogo in cima: totale e stanze con più problemi (va bene anche `riepilogo`) |
 | `dark` | `false` | Colori pieni per il tema scuro, invece dell'effetto vetro |
-| `battery` | `20` | Soglia in % sotto cui una batteria è "scarica" |
-| `rows` | `7` | Righe mostrate per riquadro prima di "Mostra tutti" |
-| `exclude_label` | `fuori_monitoraggio` | ID dell'etichetta dei dispositivi da ignorare |
+| `battery` | `20` | Soglia in % sotto cui una batteria è "scarica" (da 0 a 100) |
+| `rows` | `7` | Righe mostrate per riquadro prima di "Mostra tutti" (1 o più) |
+| `exclude_label` | `fuori_monitoraggio` | ID dell'etichetta dei dispositivi da ignorare del tutto: disponibilità, aggiornamenti e batterie |
 
-Un dispositivo risulta "non risponde" quando **tutte** le sue entità sono non disponibili. Ai dispositivi che si spengono di proposito (una lavatrice, una TV staccata) dai l'etichetta "Fuori monitoraggio".
+Un dispositivo risulta "non risponde" quando almeno una sua entità è non disponibile e nessun'altra ha uno stato reale (sono tutte non disponibili o sconosciute). È una stima basata sulle entità, non una verifica diretta della connessione. Tra le batterie scariche ci sono i sensori di batteria sotto soglia e i sensori binari di batteria che segnalano "scarica"; un dispositivo già elencato con la percentuale non viene contato due volte. Se le integrazioni non si possono leggere, la card lo dice invece di mostrare "Tutto a posto". Ai dispositivi che si spengono di proposito (una lavatrice, una TV staccata) dai l'etichetta "Fuori monitoraggio".
 
 ## Indicatore ad anello
 
@@ -65,11 +65,11 @@ grid_options: {columns: 3, rows: 3}
 | --- | --- | --- |
 | `entity` | obbligatoria | Il sensore numerico da mostrare |
 | `name` | nome dell'entità | Scritta sotto l'anello |
-| `min` / `max` | `0` / `100` | Valori dell'anello vuoto e pieno |
+| `min` / `max` | `0` / `100` | Valori dell'anello vuoto e pieno (`max` deve essere maggiore di `min`) |
 | `warn` / `bad` | nessuna | Soglie dell'arancione e del rosso |
 | `invert` | `false` | Colori al contrario: rosso quando il valore è basso, per esempio giorni a una scadenza |
 | `unit` | unità dell'entità | Testo sotto il numero |
-| `decimals` | 1 sotto 10, poi 0 | Cifre decimali |
+| `decimals` | 1 sotto 10, poi 0 | Cifre decimali (da 0 a 6) |
 
 Quattro anelli da 3 colonne stanno su una riga.
 

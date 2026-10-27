@@ -30,8 +30,8 @@ Both cards follow the language of Home Assistant: English, or Italian when Home 
 ### Manual
 
 1. Download [`homeray-cards.js`](https://github.com/AndreaGuarducci/homeray-cards/raw/main/homeray-cards.js) and copy it to `/config/www/`.
-2. Settings → Dashboards → three dots → **Resources** → **Add resource**: URL `/local/homeray-cards.js?v=1.0.0`, type **JavaScript module**.
-3. Reload the page (Ctrl+Shift+R). The browser console shows `HOMERAY 1.0.0`.
+2. Settings → Dashboards → three dots → **Resources** → **Add resource**: URL `/local/homeray-cards.js?v=1.0.1`, type **JavaScript module**.
+3. Reload the page (Ctrl+Shift+R). The browser console shows `HOMERAY 1.0.1`.
 
 ## Issues card
 
@@ -45,11 +45,11 @@ dark: true
 | --- | --- | --- |
 | `summary` | `false` | Shows the top summary: total count and the areas with the most issues |
 | `dark` | `false` | Solid colours for dark themes instead of the glass look |
-| `battery` | `20` | Battery level (%) below which a battery is "low" |
-| `rows` | `7` | Rows shown per panel before "Show all" |
-| `exclude_label` | `fuori_monitoraggio` | Label ID of devices to ignore |
+| `battery` | `20` | Battery level (%) below which a battery is "low" (0–100) |
+| `rows` | `7` | Rows shown per panel before "Show all" (1 or more) |
+| `exclude_label` | `fuori_monitoraggio` | Label ID of devices to ignore everywhere: availability, updates and batteries |
 
-A device counts as "not responding" when **all** of its entities are unavailable. Devices that are switched off on purpose (a washing machine, a TV on a power strip) can be excluded with a label: create a label, add it to the device and set its ID in `exclude_label`.
+A device counts as "not responding" when at least one of its entities is unavailable and none of the others reports a real state (they are all unavailable or unknown). This is an estimate based on the entities, not a direct connectivity test. Low batteries include battery sensors below the threshold and binary battery sensors that report "low"; a device listed with its percentage is not counted twice. If the integrations cannot be read, the card says so instead of showing "All good". Devices that are switched off on purpose (a washing machine, a TV on a power strip) can be excluded with a label: create a label, add it to the device and set its ID in `exclude_label`.
 
 ## Gauge card
 
@@ -69,11 +69,11 @@ grid_options: {columns: 3, rows: 3}
 | --- | --- | --- |
 | `entity` | required | Numeric sensor to show |
 | `name` | entity name | Label under the ring |
-| `min` / `max` | `0` / `100` | Values of the empty and full ring |
+| `min` / `max` | `0` / `100` | Values of the empty and full ring (`max` must be greater than `min`) |
 | `warn` / `bad` | none | Orange and red thresholds |
 | `invert` | `false` | Reverse colours: red when the value is low (e.g. days left) |
 | `unit` | entity unit | Text under the number |
-| `decimals` | 1 below 10, else 0 | Decimal digits |
+| `decimals` | 1 below 10, else 0 | Decimal digits (0–6) |
 
 Four gauges of 3 columns fit on one row.
 
