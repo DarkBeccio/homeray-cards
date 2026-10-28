@@ -28,8 +28,8 @@ Le card usano la lingua di Home Assistant: italiano se Home Assistant è in ital
 ### A mano
 
 1. Scarica [`homeray-cards.js`](https://github.com/DarkBeccio/homeray-cards/raw/main/homeray-cards.js) e copialo in `/config/www/`.
-2. Impostazioni → Dashboard → tre puntini → **Risorse** → **Aggiungi risorsa**: URL `/local/homeray-cards.js?v=1.0.1`, tipo **Modulo JavaScript**.
-3. Ricarica la pagina (Ctrl+Maiusc+R). Nella console del browser compare `HOMERAY 1.0.1`.
+2. Impostazioni → Dashboard → tre puntini → **Risorse** → **Aggiungi risorsa**: URL `/local/homeray-cards.js?v=1.0.2`, tipo **Modulo JavaScript**.
+3. Ricarica la pagina (Ctrl+Maiusc+R). Nella console del browser compare `HOMERAY 1.0.2`.
 
 ## Quadro dei problemi
 

@@ -1,5 +1,5 @@
 /*!
- * Homeray v1.0.1 - an X-ray of your home in Home Assistant
+ * Homeray v1.0.2 - an X-ray of your home in Home Assistant
  * homeray-issues-card (issues dashboard) and homeray-gauge-card (ring gauge)
  * https://github.com/DarkBeccio/homeray-cards - MIT License - (c) 2026 DarkBeccio
  * Want the home network map? Homeray Pro: https://homeray.app
@@ -15,20 +15,20 @@ const pretty=d=>String(d).replace(/_/g,' ').replace(/^./,m=>m.toUpperCase());
 /* ---------- languages: English by default, Italian when Home Assistant is set to Italian ---------- */
 const pl=(n,a,b)=>n===1?a:b;
 const I18N={
- en:{device:'Device',na:'not available',noRoom:'No area',otherRooms:' other areas',less:'Show less',all:n=>'Show all ('+n+')',
+ en:{device:'Device',na:'not available',noRoom:'No area',otherRooms:n=>pl(n,' other area',' other areas'),less:'Show less',all:n=>'Show all ('+n+')',
   why:{setup_error:'setup failed',setup_retry:'unreachable, retrying',setup_in_progress:'unreachable, retrying',not_loaded:'not loaded',failed_unload:'stuck',migration_error:'migration error'},
   stDev:n=>pl(n,'device not responding','devices not responding'),stInt:n=>pl(n,'integration stopped','integrations stopped'),stUpd:n=>pl(n,'update pending','updates pending'),stBat:n=>pl(n,'low battery','low batteries'),
-  pDev:'Devices not responding',pInt:'Stopped integrations',pUpd:'Pending updates',pBat:x=>'Batteries below '+x+'%',
-  eDev:'All devices are responding',iLoad:'Checking integrations…',iErr:'Could not read the integrations',iStale:'Last check failed: showing the previous result',partial:'Check incomplete',iSub:' Integrations could not be checked.',low:'low',eInt:'All integrations are running',eUpd:'No pending updates',eBat:'No low batteries',
+  pDev:'Devices not responding',pInt:'Stopped integrations',pUpd:'Pending updates',pBat:x=>'Low batteries',
+  eDev:'All devices are responding',iLoad:'Checking integrations…',iErr:'Could not read the integrations',iStale:'Last check failed: showing the previous result',partial:'Check incomplete',iSub:' Integrations could not be checked.',staleSub:m=>'The last integration check failed; the result shown is from '+(m<1?'less than a minute':m+pl(m,' minute',' minutes'))+' ago.',low:'low',eInt:'All integrations are running',eUpd:'No pending updates',eBat:'No low batteries',
   title:t=>t?t+pl(t,' thing to check',' things to check'):'All good',
   sub:d=>{const p=[];if(d.dev.length)p.push(d.dev.length+pl(d.dev.length,' device is not responding',' devices are not responding'));if(d.integ.length)p.push(d.integ.length+pl(d.integ.length,' integration is stopped',' integrations are stopped'));if(d.upd.length)p.push(d.upd.length+pl(d.upd.length,' update pending',' updates pending'));if(d.bat.length)p.push(d.bat.length+pl(d.bat.length,' low battery',' low batteries'));
    if(!p.length)return'Devices, integrations, updates and batteries are all fine.';const ok=[];if(!d.upd.length)ok.push('updates');if(!d.bat.length)ok.push('batteries');
    return p.join(', ')+'.'+(ok.length?' '+ok.join(' and ').replace(/^./,m=>m.toUpperCase())+(ok.length>1?' are fine.':' are fine.'):'')}},
- it:{device:'Dispositivo',na:'non disponibile',noRoom:'Senza stanza',otherRooms:' altre stanze',less:'Mostra meno',all:n=>'Mostra tutti ('+n+')',
+ it:{device:'Dispositivo',na:'non disponibile',noRoom:'Senza stanza',otherRooms:n=>pl(n,' altra stanza',' altre stanze'),less:'Mostra meno',all:n=>'Mostra tutti ('+n+')',
   why:{setup_error:'configurazione non riuscita',setup_retry:'non raggiungibile, riprova da sola',setup_in_progress:'non raggiungibile, riprova da sola',not_loaded:'non caricata',failed_unload:'bloccata',migration_error:'errore di aggiornamento'},
   stDev:n=>pl(n,'dispositivo non risponde','dispositivi non rispondono'),stInt:n=>pl(n,'integrazione ferma','integrazioni ferme'),stUpd:n=>pl(n,'aggiornamento in attesa','aggiornamenti in attesa'),stBat:n=>pl(n,'batteria scarica','batterie scariche'),
-  pDev:'Dispositivi che non rispondono',pInt:'Integrazioni ferme',pUpd:'Aggiornamenti in attesa',pBat:x=>'Batterie sotto il '+x+'%',
-  eDev:'Tutti i dispositivi rispondono',iLoad:'Verifica delle integrazioni in corso…',iErr:'Stato delle integrazioni non disponibile',iStale:'Ultima verifica non riuscita: risultato precedente',partial:'Verifica incompleta',iSub:' Non è stato possibile verificare le integrazioni.',low:'scarica',eInt:'Tutte le integrazioni sono attive',eUpd:'Nessun aggiornamento in attesa',eBat:'Nessuna batteria scarica',
+  pDev:'Dispositivi che non rispondono',pInt:'Integrazioni ferme',pUpd:'Aggiornamenti in attesa',pBat:x=>'Batterie scariche',
+  eDev:'Tutti i dispositivi rispondono',iLoad:'Verifica delle integrazioni in corso…',iErr:'Stato delle integrazioni non disponibile',iStale:'Ultima verifica non riuscita: risultato precedente',partial:'Verifica incompleta',iSub:' Non è stato possibile verificare le integrazioni.',staleSub:m=>'L\'ultima verifica delle integrazioni non è riuscita; il risultato mostrato è di '+(m<1?'meno di un minuto':m+pl(m,' minuto',' minuti'))+' fa.',low:'scarica',eInt:'Tutte le integrazioni sono attive',eUpd:'Nessun aggiornamento in attesa',eBat:'Nessuna batteria scarica',
   title:t=>t?t+pl(t,' cosa da controllare',' cose da controllare'):'Tutto a posto',
   sub:d=>{const p=[];if(d.dev.length)p.push(d.dev.length+pl(d.dev.length,' dispositivo non risponde',' dispositivi non rispondono'));if(d.integ.length)p.push(d.integ.length===1?"un'integrazione è ferma":d.integ.length+' integrazioni sono ferme');if(d.upd.length)p.push(d.upd.length+pl(d.upd.length,' aggiornamento in attesa',' aggiornamenti in attesa'));if(d.bat.length)p.push(d.bat.length+pl(d.bat.length,' batteria scarica',' batterie scariche'));
    if(!p.length)return'Dispositivi, integrazioni, aggiornamenti e batterie sono a posto.';const ok=[];if(!d.upd.length)ok.push('aggiornamenti');if(!d.bat.length)ok.push('batterie');
@@ -93,7 +93,7 @@ if(!customElements.get('homeray-gauge-card'))customElements.define('homeray-gaug
 
 /* ---------- issues dashboard ---------- */
 const PCSS=`
-:host{display:block}
+:host{display:block;container-type:inline-size}
 .gl{background:var(--g);border:1px solid var(--bd);-webkit-backdrop-filter:var(--ha-card-backdrop-filter,none);backdrop-filter:var(--ha-card-backdrop-filter,none);box-shadow:var(--frosted-glass-card-depth-shadow,0 2px 8px rgba(0,0,0,.14))}
 .hero{display:flex;gap:22px;align-items:center;flex-wrap:wrap;border-radius:24px;padding:22px 24px;margin-bottom:14px;color:var(--primary-text-color)}
 .hero.bad{background:var(--hb);border:1px solid var(--hbd)}
@@ -133,8 +133,8 @@ const PCSS=`
 .more{all:unset;display:block;box-sizing:border-box;width:100%;padding:10px 16px;text-align:center;font-weight:700;color:var(--primary-color);cursor:pointer;border-top:1px solid var(--divider-color,#ddd)}
 .more:hover{background:rgba(127,127,127,.09)}
 .more:focus-visible{outline:3px solid var(--primary-color);outline-offset:-3px}
-@media (max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.cols{grid-template-columns:1fr}}
-@media (max-width:520px){.hero{padding:18px}.hero .bg{font-size:1.6rem}.dial,.dial svg{width:76px;height:76px}.st .num{font-size:2rem}.st .ic{width:40px;height:40px}}
+@container (max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.cols{grid-template-columns:1fr}}
+@container (max-width:520px){.hero{padding:18px}.hero .bg{font-size:1.6rem}.dial,.dial svg{width:76px;height:76px}.st .num{font-size:2rem}.st .ic{width:40px;height:40px}}
 `;
 class CasaProblemiCard extends HTMLElement{
   setConfig(c){
@@ -154,13 +154,17 @@ class CasaProblemiCard extends HTMLElement{
     if(this._h)this._draw();
   }
   connectedCallback(){clearInterval(this._iv);this._iv=setInterval(()=>this._tick(),60000);this._tick()}
-  disconnectedCallback(){clearInterval(this._iv);this._iv=null;clearTimeout(this._tm);this._tm=null}
+  disconnectedCallback(){clearInterval(this._iv);this._iv=null;clearTimeout(this._tm);this._tm=null;this._seq=(this._seq||0)+1}
   set hass(h){const first=!this._h;this._h=h;if(first)this._tick();if(!this._tm)this._tm=setTimeout(()=>{this._tm=null;this._draw()},first?0:2000)}
   getCardSize(){return 10}
   getGridOptions(){return{columns:'full',rows:'auto'}}
   async _tick(){
     if(!this._h)return;
-    try{const r=await this._h.callWS({type:'config_entries/get'});this._entries=Array.isArray(r)?r:[];this._entErr=false}catch(e){this._entErr=true}
+    /* only the newest request may update the card: an older answer arriving late is ignored */
+    const seq=this._seq=(this._seq||0)+1;
+    let r,ok=true;try{r=await this._h.callWS({type:'config_entries/get'})}catch(e){ok=false}
+    if(seq!==this._seq)return;
+    if(ok){this._entries=Array.isArray(r)?r:[];this._entErr=false;this._entAt=Date.now()}else this._entErr=true;
     if(this.isConnected)this._draw();
   }
   _act(el){
@@ -190,6 +194,7 @@ class CasaProblemiCard extends HTMLElement{
     }
     dev.sort((a,b)=>(a.sub||'~').localeCompare(b.sub||'~')||a.name.localeCompare(b.name,this._lc,{numeric:true}));
     const ist=this._entries===null?(this._entErr?'err':'load'):(this._entErr?'stale':'ok');
+    const age=ist==='stale'&&this._entAt?Math.floor((Date.now()-this._entAt)/60000):0;
     const integ=(this._entries||[]).filter(e=>e.state!=='loaded'&&!e.disabled_by&&e.source!=='ignore').map(e=>({nav:'/config/integrations/integration/'+e.domain,name:pretty(e.domain)+(e.title&&e.title.indexOf('@')<0&&e.title.toLowerCase()!==e.domain?' · '+e.title:''),sub:T.why[e.state]||e.state,icon:'mdi:puzzle-remove'}));
     const upd=[],bat=[],low=[],batDev=new Set();
     for(const id in h.states){
@@ -201,8 +206,8 @@ class CasaProblemiCard extends HTMLElement{
       else if(id.startsWith('binary_sensor.')&&s.attributes.device_class==='battery'&&s.state==='on')low.push({ent:id,dv,name:s.attributes.friendly_name||id,sub:T.low,icon:'mdi:battery-alert-variant-outline'});
     }
     /* a device already listed with its percentage is not counted twice */
-    for(const x of low)if(!x.dv||!batDev.has(x.dv))bat.push({ent:x.ent,name:x.name,sub:x.sub,icon:x.icon});
-    return{dev,integ,upd,bat,ist};
+    for(const x of low)if(!x.dv||!batDev.has(x.dv)){bat.push({ent:x.ent,name:x.name,sub:x.sub,icon:x.icon});if(x.dv)batDev.add(x.dv)}
+    return{dev,integ,upd,bat,ist,age};
   }
   /* summary tile: neutral glass; colour lives in the icon circle, solid when there is something to look at */
   _stat(n,lab,icon,level){
@@ -216,12 +221,12 @@ class CasaProblemiCard extends HTMLElement{
     const bad=d.dev.length+d.integ.length,warn=d.upd.length+d.bat.length,tot=bad+warn;
     const all=Math.max(tot,1),pb=tot?Math.round(bad/all*100):0,pw=tot?Math.round(warn/all*100):0;
     const ring='<div class="dial"><svg viewBox="0 0 96 96" aria-hidden="true"><circle cx="48" cy="48" r="40" fill="none" stroke="var(--divider-color,#2a2a2a)" stroke-width="9"/>'+(tot?'<circle cx="48" cy="48" r="40" fill="none" stroke="#FF6B7A" stroke-width="9" stroke-linecap="round" pathLength="100" stroke-dasharray="'+Math.max(pb-2,0)+' 100"/>'+(pw?'<circle cx="48" cy="48" r="40" fill="none" stroke="#FFB547" stroke-width="9" stroke-linecap="round" pathLength="100" stroke-dasharray="'+Math.max(pw-2,0)+' 100" stroke-dashoffset="-'+pb+'"/>':''):'<circle cx="48" cy="48" r="40" fill="none" stroke="#3EE08F" stroke-width="9" pathLength="100" stroke-dasharray="100 100"/>')+'</svg><div class="vv">'+(tot||'✓')+'</div></div>';
-    const T=this._t,part=d.ist==='load'||d.ist==='err',sub=part?(tot?T.sub(d)+T.iSub:(d.ist==='load'?T.iLoad:T.iErr)):T.sub(d);
+    const T=this._t,part=d.ist!=='ok',sub=d.ist==='stale'?(tot?T.sub(d)+' ':'')+T.staleSub(d.age):(part?(tot?T.sub(d)+T.iSub:(d.ist==='load'?T.iLoad:T.iErr)):T.sub(d));
     if(part&&!tot)return'<div class="hero">'+ring.replace('#3EE08F',MUTE).replace('✓','?')+'<div class="ht"><div class="bg">'+esc(T.partial)+'</div><div class="hs">'+esc(sub)+'</div></div></div>';
     const by={};for(const x of d.dev){const k=x.sub||T.noRoom;by[k]=(by[k]||0)+1}
-    const keys=Object.keys(by).sort((a,b)=>by[b]-by[a]),top=keys.slice(0,3),rest=keys.slice(3).reduce((s,k)=>s+by[k],0);
+    const keys=Object.keys(by).sort((a,b)=>by[b]-by[a]),top=keys.slice(0,3),rest=keys.length-top.length;
     let chips='';for(const k of top)chips+='<span class="chip"><b>'+by[k]+'</b> '+esc(k)+'</span>';
-    if(rest)chips+='<span class="chip"><b>'+rest+'</b>'+esc(T.otherRooms)+'</span>';
+    if(rest)chips+='<span class="chip"><b>+'+rest+'</b>'+esc(T.otherRooms(rest))+'</span>';
     return'<div class="hero '+(tot?'bad':'good')+'">'+ring+'<div class="ht"><div class="bg">'+esc(T.title(tot))+'</div><div class="hs">'+esc(sub)+'</div>'+(chips?'<div class="chips">'+chips+'</div>':'')+'</div></div>';
   }
   _panel(key,title,icon,items,level,empty,note,unknown){
@@ -253,4 +258,4 @@ window.customCards=window.customCards||[];
 window.customCards.push({type:'homeray-issues-card',name:'Homeray Issues Card',description:'Issues dashboard: devices, integrations, updates, batteries'},{type:'homeray-gauge-card',name:'Homeray Gauge Card',description:'Ring gauge with colour thresholds'});
 
 })();
-console.info("%c HOMERAY %c 1.0.1 ","background:#3DD9F5;color:#0A0F1C;font-weight:700","background:#111A2C;color:#E8EEF8");
+console.info("%c HOMERAY %c 1.0.2 ","background:#3DD9F5;color:#0A0F1C;font-weight:700","background:#111A2C;color:#E8EEF8");
