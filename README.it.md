@@ -83,4 +83,4 @@ Homeray Pro è in italiano e in inglese e comprende anche un tema scuro, una das
 
 ## Licenza
 
-MIT © 2026 Andrea Guarducci. Homeray è un progetto indipendente, non affiliato a Home Assistant né a Nabu Casa.
+MIT © 2026 DarkBeccio. Homeray è un progetto indipendente, non affiliato a Home Assistant né a Nabu Casa.

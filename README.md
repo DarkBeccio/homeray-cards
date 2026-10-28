@@ -87,4 +87,4 @@ Homeray Pro speaks English and Italian, and also includes a dark theme, a ready-
 
 ## License
 
-MIT © 2026 Andrea Guarducci. Homeray is an independent project and is not affiliated with Home Assistant or Nabu Casa.
+MIT © 2026 DarkBeccio. Homeray is an independent project and is not affiliated with Home Assistant or Nabu Casa.
