@@ -3,8 +3,8 @@
 **An X-ray of your home in Home Assistant.** Homeray shows at a glance what is not working in your smart home: devices that stopped responding, integrations that failed, pending updates and low batteries. No configuration needed.
 
 [![hacs](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz/docs/faq/custom_repositories)
-[![release](https://img.shields.io/github/v/release/AndreaGuarducci/homeray-cards)](https://github.com/AndreaGuarducci/homeray-cards/releases)
-[![license](https://img.shields.io/github/license/AndreaGuarducci/homeray-cards)](LICENSE)
+[![release](https://img.shields.io/github/v/release/DarkBeccio/homeray-cards)](https://github.com/DarkBeccio/homeray-cards/releases)
+[![license](https://img.shields.io/github/license/DarkBeccio/homeray-cards)](LICENSE)
 
 🇮🇹 [Leggi in italiano](README.it.md)
 
@@ -24,12 +24,12 @@ Both cards follow the language of Home Assistant: English, or Italian when Home 
 ### HACS (recommended)
 
 1. HACS → three dots (top right) → **Custom repositories**.
-2. Repository: `https://github.com/AndreaGuarducci/homeray-cards`, type: **Dashboard**.
+2. Repository: `https://github.com/DarkBeccio/homeray-cards`, type: **Dashboard**.
 3. Search for **Homeray**, download it and reload the page.
 
 ### Manual
 
-1. Download [`homeray-cards.js`](https://github.com/AndreaGuarducci/homeray-cards/raw/main/homeray-cards.js) and copy it to `/config/www/`.
+1. Download [`homeray-cards.js`](https://github.com/DarkBeccio/homeray-cards/raw/main/homeray-cards.js) and copy it to `/config/www/`.
 2. Settings → Dashboards → three dots → **Resources** → **Add resource**: URL `/local/homeray-cards.js?v=1.0.1`, type **JavaScript module**.
 3. Reload the page (Ctrl+Shift+R). The browser console shows `HOMERAY 1.0.1`.
 

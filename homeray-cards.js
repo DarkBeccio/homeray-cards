@@ -1,7 +1,7 @@
 /*!
  * Homeray v1.0.1 - an X-ray of your home in Home Assistant
  * homeray-issues-card (issues dashboard) and homeray-gauge-card (ring gauge)
- * https://github.com/AndreaGuarducci/homeray-cards - MIT License - (c) 2026 DarkBeccio
+ * https://github.com/DarkBeccio/homeray-cards - MIT License - (c) 2026 DarkBeccio
  * Want the home network map? Homeray Pro: https://homeray.app
  */
 (()=>{

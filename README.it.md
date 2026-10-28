@@ -20,12 +20,12 @@ Le card usano la lingua di Home Assistant: italiano se Home Assistant è in ital
 ### Con HACS (consigliata)
 
 1. HACS → tre puntini in alto a destra → **Repository personalizzati**.
-2. Repository: `https://github.com/AndreaGuarducci/homeray-cards`, tipo: **Dashboard**.
+2. Repository: `https://github.com/DarkBeccio/homeray-cards`, tipo: **Dashboard**.
 3. Cerca **Homeray**, scaricalo e ricarica la pagina.
 
 ### A mano
 
-1. Scarica [`homeray-cards.js`](https://github.com/AndreaGuarducci/homeray-cards/raw/main/homeray-cards.js) e copialo in `/config/www/`.
+1. Scarica [`homeray-cards.js`](https://github.com/DarkBeccio/homeray-cards/raw/main/homeray-cards.js) e copialo in `/config/www/`.
 2. Impostazioni → Dashboard → tre puntini → **Risorse** → **Aggiungi risorsa**: URL `/local/homeray-cards.js?v=1.0.1`, tipo **Modulo JavaScript**.
 3. Ricarica la pagina (Ctrl+Maiusc+R). Nella console del browser compare `HOMERAY 1.0.1`.
 
