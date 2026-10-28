@@ -2,6 +2,8 @@
 
 **La radiografia della tua casa in Home Assistant.** Homeray ti mostra a colpo d'occhio cosa non funziona nella tua casa intelligente: dispositivi che non rispondono, integrazioni ferme, aggiornamenti in attesa e batterie scariche. Non va configurato.
 
+[![Offrimi un caffè](https://img.shields.io/badge/Offrimi%20un%20caff%C3%A8-PayPal-FFB547?logo=paypal&logoColor=white)](https://paypal.me/AndreaGuarducci1992)
+
 🇬🇧 [Read in English](README.md)
 
 ![Quadro dei problemi di Homeray](images/issues-it.png)
@@ -80,6 +82,10 @@ Vuoi vedere tutta la rete di casa, piano per piano? **Homeray Pro** aggiunge la 
 ![Mappa della casa di Homeray Pro](images/homeray-pro-map-it.png)
 
 Homeray Pro è in italiano e in inglese e comprende anche un tema scuro, una dashboard di sistema pronta, la modalità demo con dati finti e la guida completa. → **[homeray.app](https://homeray.app)**
+
+## Sostieni il progetto
+
+Homeray è gratis. Se ti fa risparmiare tempo, puoi [offrirmi un caffè](https://paypal.me/AndreaGuarducci1992) ☕
 
 ## Licenza
 

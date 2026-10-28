@@ -5,6 +5,7 @@
 [![hacs](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz/docs/faq/custom_repositories)
 [![release](https://img.shields.io/github/v/release/DarkBeccio/homeray-cards)](https://github.com/DarkBeccio/homeray-cards/releases)
 [![license](https://img.shields.io/github/license/DarkBeccio/homeray-cards)](LICENSE)
+[![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-PayPal-FFB547?logo=paypal&logoColor=white)](https://paypal.me/AndreaGuarducci1992)
 
 🇮🇹 [Leggi in italiano](README.it.md)
 
@@ -84,6 +85,10 @@ Want to see your whole home network, floor by floor? **Homeray Pro** adds the ho
 ![Homeray Pro home map](images/homeray-pro-map.png)
 
 Homeray Pro speaks English and Italian, and also includes a dark theme, a ready-made system dashboard, a demo mode with fake data and a full guide. → **[homeray.app](https://homeray.app)**
+
+## Support the project
+
+Homeray is free. If it saves you time, you can [buy me a coffee](https://paypal.me/AndreaGuarducci1992) ☕
 
 ## License
 
