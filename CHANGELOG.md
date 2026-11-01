@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.0 - 2026-11-01
+
+- Issues card: every device shows how long it has been unreachable ("for 3 days"), and the oldest outages come first.
+- Issues card: new `grace` option (default 5 minutes): a device that dropped only a moment ago is not listed yet, so short drops do not raise an alarm.
+- Issues card: TVs, speakers and other media players that are switched off go to a grey "Off or in standby" list instead of the red one (`standby_domains`, default `[media_player]`).
+- Issues card: administrators can stop monitoring a device from the card (eye button, with confirmation); the label is created if missing. Ignored devices are listed at the bottom and can be monitored again.
+- Issues card: the summary names the longest outage and when the check ran; its chips cover integrations, updates, batteries and standby, and jump to their panel.
+- Issues card: devices with the same name get their model and a number; devices without an area say so.
+- Issues card: on narrow screens the detail goes under the name instead of cutting it.
+- Issues card: other packages can add row actions through `window.homerayIssueActions`.
+
 ## 1.0.2 - 2026-10-28
 
 - Issues card: when the latest integration check fails, the summary no longer says "All good"; it shows "Check incomplete" and how old the previous result is.

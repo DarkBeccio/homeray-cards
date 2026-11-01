@@ -15,7 +15,7 @@
 
 | Card | What it does |
 | --- | --- |
-| `homeray-issues-card` | Finds on its own the devices that are not responding, stopped integrations, pending updates and low batteries, grouped by area. Tap a row to open it. |
+| `homeray-issues-card` | Finds on its own the devices that are not responding (and for how long), stopped integrations, pending updates and low batteries. TVs in standby are kept apart, and you can stop monitoring a device right from the card. Tap a row to open it. |
 | `homeray-gauge-card` | A ring gauge with colour thresholds, for CPU, memory, disk, temperature or any numeric sensor. |
 
 Both cards follow the language of Home Assistant: English, or Italian when Home Assistant is set to Italian.
@@ -31,8 +31,8 @@ Both cards follow the language of Home Assistant: English, or Italian when Home 
 ### Manual
 
 1. Download [`homeray-cards.js`](https://github.com/DarkBeccio/homeray-cards/raw/main/homeray-cards.js) and copy it to `/config/www/`.
-2. Settings → Dashboards → three dots → **Resources** → **Add resource**: URL `/local/homeray-cards.js?v=1.0.2`, type **JavaScript module**.
-3. Reload the page (Ctrl+Shift+R). The browser console shows `HOMERAY 1.0.2`.
+2. Settings → Dashboards → three dots → **Resources** → **Add resource**: URL `/local/homeray-cards.js?v=1.1.0`, type **JavaScript module**.
+3. Reload the page (Ctrl+Shift+R). The browser console shows `HOMERAY 1.1.0`.
 
 ## Issues card
 
@@ -49,8 +49,12 @@ dark: true
 | `battery` | `20` | Battery level (%) below which a battery is "low" (0–100) |
 | `rows` | `7` | Rows shown per panel before "Show all" (1 or more) |
 | `exclude_label` | `fuori_monitoraggio` | Label ID of devices to ignore everywhere: availability, updates and batteries |
+| `grace` | `5` | Minutes a device must stay unreachable before it is listed, so short drops do not raise an alarm (0 = list it at once) |
+| `standby_domains` | `[media_player]` | Devices with an entity of these domains (TVs, speakers, streamers) go to the grey "Off or in standby" list instead of the red one. `[]` turns this off |
 
-A device counts as "not responding" when at least one of its entities is unavailable and none of the others reports a real state (they are all unavailable or unknown). This is an estimate based on the entities, not a direct connectivity test. Low batteries include battery sensors below the threshold and binary battery sensors that report "low"; a device listed with its percentage is not counted twice. If the integrations cannot be read, the card says so instead of showing "All good". Devices that are switched off on purpose (a washing machine, a TV on a power strip) can be excluded with a label: create a label, add it to the device and set its ID in `exclude_label`.
+A device counts as "not responding" when at least one of its entities is unavailable and none of the others reports a real state (they are all unavailable or unknown). This is an estimate based on the entities, not a direct connectivity test. Each row shows how long the device has been unreachable, and the oldest outages come first; the time counts from the last change Home Assistant saw, so a restart starts it again. Low batteries include battery sensors below the threshold and binary battery sensors that report "low"; a device listed with its percentage is not counted twice. If the integrations cannot be read, the card says so instead of showing "All good".
+
+**Stop monitoring a device.** Administrators see an eye button on each row: tap it, confirm, and the device gets the `exclude_label` label (the label is created if it does not exist yet). To monitor it again, open the folded "Ignored" list at the bottom. You can also add the label by hand in Settings → Devices. Non-administrators see no buttons.
 
 ## Gauge card
 
@@ -84,7 +88,7 @@ Want to see your whole home network, floor by floor? **Homeray Pro** adds the ho
 
 ![Homeray Pro home map](images/homeray-pro-map.png)
 
-Homeray Pro speaks English and Italian, and also includes a dark theme, a ready-made system dashboard, a demo mode with fake data and a full guide. → **[homeray.app](https://homeray.app)**
+Homeray Pro speaks English and Italian, and also includes a reliability card (availability, drops and longest outage of each device over the last days), a Reload button for stopped integrations, a dark theme, a ready-made system dashboard, a demo mode with fake data and a full guide. → **[homeray.app](https://homeray.app)**
 
 ## Support the project
 

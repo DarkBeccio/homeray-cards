@@ -12,7 +12,7 @@
 
 | Card | Cosa fa |
 | --- | --- |
-| `homeray-issues-card` | Trova da sola i dispositivi che non rispondono, le integrazioni ferme, gli aggiornamenti in attesa e le batterie scariche, divisi per stanza. Toccando una riga si apre il dettaglio. |
+| `homeray-issues-card` | Trova da sola i dispositivi che non rispondono (e da quanto), le integrazioni ferme, gli aggiornamenti in attesa e le batterie scariche. Le TV in standby stanno in un elenco a parte e puoi smettere di monitorare un dispositivo direttamente dalla card. Toccando una riga si apre il dettaglio. |
 | `homeray-gauge-card` | Indicatore ad anello con soglie di colore, per CPU, memoria, disco, temperatura o qualsiasi sensore numerico. |
 
 Le card usano la lingua di Home Assistant: italiano se Home Assistant è in italiano, altrimenti inglese.
@@ -28,8 +28,8 @@ Le card usano la lingua di Home Assistant: italiano se Home Assistant è in ital
 ### A mano
 
 1. Scarica [`homeray-cards.js`](https://github.com/DarkBeccio/homeray-cards/raw/main/homeray-cards.js) e copialo in `/config/www/`.
-2. Impostazioni → Dashboard → tre puntini → **Risorse** → **Aggiungi risorsa**: URL `/local/homeray-cards.js?v=1.0.2`, tipo **Modulo JavaScript**.
-3. Ricarica la pagina (Ctrl+Maiusc+R). Nella console del browser compare `HOMERAY 1.0.2`.
+2. Impostazioni → Dashboard → tre puntini → **Risorse** → **Aggiungi risorsa**: URL `/local/homeray-cards.js?v=1.1.0`, tipo **Modulo JavaScript**.
+3. Ricarica la pagina (Ctrl+Maiusc+R). Nella console del browser compare `HOMERAY 1.1.0`.
 
 ## Quadro dei problemi
 
@@ -46,8 +46,12 @@ dark: true
 | `battery` | `20` | Soglia in % sotto cui una batteria è "scarica" (da 0 a 100) |
 | `rows` | `7` | Righe mostrate per riquadro prima di "Mostra tutti" (1 o più) |
 | `exclude_label` | `fuori_monitoraggio` | ID dell'etichetta dei dispositivi da ignorare del tutto: disponibilità, aggiornamenti e batterie |
+| `grace` | `5` | Minuti in cui un dispositivo deve restare irraggiungibile prima di comparire, così le cadute brevi non fanno scattare l'allarme (0 = subito) |
+| `standby_domains` | `[media_player]` | I dispositivi con un'entità di questi domini (TV, casse, lettori) vanno nell'elenco grigio "Spenti o in standby" invece che in quello rosso. `[]` lo disattiva |
 
-Un dispositivo risulta "non risponde" quando almeno una sua entità è non disponibile e nessun'altra ha uno stato reale (sono tutte non disponibili o sconosciute). È una stima basata sulle entità, non una verifica diretta della connessione. Tra le batterie scariche ci sono i sensori di batteria sotto soglia e i sensori binari di batteria che segnalano "scarica"; un dispositivo già elencato con la percentuale non viene contato due volte. Se le integrazioni non si possono leggere, la card lo dice invece di mostrare "Tutto a posto". Ai dispositivi che si spengono di proposito (una lavatrice, una TV staccata) dai l'etichetta "Fuori monitoraggio".
+Un dispositivo risulta "non risponde" quando almeno una sua entità è non disponibile e nessun'altra ha uno stato reale (sono tutte non disponibili o sconosciute). È una stima basata sulle entità, non una verifica diretta della connessione. Ogni riga dice da quanto tempo il dispositivo non risponde, e le cadute più vecchie vengono per prime; il tempo parte dall'ultimo cambio di stato visto da Home Assistant, quindi un riavvio lo azzera. Tra le batterie scariche ci sono i sensori di batteria sotto soglia e i sensori binari di batteria che segnalano "scarica"; un dispositivo già elencato con la percentuale non viene contato due volte. Se le integrazioni non si possono leggere, la card lo dice invece di mostrare "Tutto a posto".
+
+**Smettere di monitorare un dispositivo.** Gli amministratori vedono un pulsante a forma di occhio su ogni riga: lo tocchi, confermi, e il dispositivo riceve l'etichetta `exclude_label` (se l'etichetta non esiste, viene creata). Per rimetterlo sotto controllo, apri l'elenco "Non monitorati" in fondo. L'etichetta si può anche aggiungere a mano da Impostazioni → Dispositivi. Chi non è amministratore non vede i pulsanti.
 
 ## Indicatore ad anello
 
@@ -81,7 +85,7 @@ Vuoi vedere tutta la rete di casa, piano per piano? **Homeray Pro** aggiunge la 
 
 ![Mappa della casa di Homeray Pro](images/homeray-pro-map-it.png)
 
-Homeray Pro è in italiano e in inglese e comprende anche un tema scuro, una dashboard di sistema pronta, la modalità demo con dati finti e la guida completa. → **[homeray.app](https://homeray.app)**
+Homeray Pro è in italiano e in inglese e comprende anche una card di affidabilità (disponibilità, cadute e caduta più lunga di ogni apparato negli ultimi giorni), il pulsante Ricarica per le integrazioni ferme, un tema scuro, una dashboard di sistema pronta, la modalità demo con dati finti e la guida completa. → **[homeray.app](https://homeray.app)**
 
 ## Sostieni il progetto
 
