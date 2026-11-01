@@ -51,6 +51,45 @@ const res=await p.evaluate(async()=>{
  let opened=0;g.addEventListener('hass-more-info',()=>opened++);g.shadowRoot.querySelector('ha-card').dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));ok('gauge opens with Enter',opened===1);
  // Italian
  c=card({summary:true});c.hass=hass({language:'it',callWS:()=>Promise.reject(1)});await wait(30);ok('Italian texts',/Verifica incompleta/.test(txt(c)));
+ // 1.1.0: duration, grace, standby, duplicates, ignore/restore, chips
+ const T0=Date.now(),iso=m=>new Date(T0-m*60000).toISOString();
+ const s3={'light.old':{state:'unavailable',last_changed:iso(3*1440),attributes:{}},'light.new':{state:'unavailable',last_changed:iso(2),attributes:{}},
+  'media_player.tv':{state:'unavailable',last_changed:iso(60),attributes:{}},'remote.tv':{state:'unavailable',last_changed:iso(60),attributes:{}},
+  'light.a':{state:'unavailable',last_changed:iso(30),attributes:{}},'light.b':{state:'unavailable',last_changed:iso(40),attributes:{}},'light.ig':{state:'unavailable',last_changed:iso(40),attributes:{}}};
+ const e3={'light.old':{device_id:'old'},'light.new':{device_id:'new'},'media_player.tv':{device_id:'tv'},'remote.tv':{device_id:'tv'},'light.a':{device_id:'a'},'light.b':{device_id:'b'},'light.ig':{device_id:'ig'}};
+ const d3={old:{name:'Porch',area_id:'g'},new:{name:'Hall'},tv:{name:'TV'},a:{name:'Lamp',model:'X1'},b:{name:'Lamp',model:'X1'},ig:{name:'Ignored lamp',labels:['fuori_monitoraggio']}};
+ const calls=[];const ws=async m=>{calls.push(m);if(m.type==='config/label_registry/list')return[];return m.type==='config_entries/get'?[{entry_id:'e1',domain:'reolink',state:'setup_retry',title:'Cam'}]:{}};
+ c=card({summary:true});c.hass=hass({states:s3,entities:e3,devices:d3,areas:{g:{name:'Garden'}},callWS:ws,user:{is_admin:true}});await wait(30);
+ let dd=c._data();
+ ok('duration shown in days',/Garden · for 3 days/.test(txt(c)));
+ ok('grace hides a device down for 2 minutes',!dd.dev.some(x=>x.name==='Hall'));
+ c.setConfig({summary:true,grace:0});dd=c._data();ok('grace: 0 shows it',dd.dev.some(x=>x.name==='Hall'));
+ ok('media player goes to standby, not to the red list',dd.stb.length===1&&!dd.dev.some(x=>x.name==='TV')&&/1 in standby/.test(txt(c)));
+ ok('oldest outage first',dd.dev[0].name==='Porch');
+ ok('hero names the longest outage',/Longest: Porch \(Garden\), not responding for 3 days/.test(txt(c)));
+ ok('same names get model and number',dd.dev.filter(x=>/^Lamp · X1 #[12]$/.test(x.name)).length===2);
+ ok('no area is written out',/No area/.test(txt(c)));
+ ok('integration chip in hero',/1 integration/.test(txt(c)));
+ ok('ignored panel lists labelled devices',dd.ign.length===1&&/Ignored \(1\)/.test(txt(c)));
+ c.hass=hass({states:s3,entities:e3,devices:Object.assign({grp:{name:'Group',labels:['fuori_monitoraggio']}},d3),areas:{g:{name:'Garden'}},callWS:ws,user:{is_admin:true}});c._sig=null;c._draw();ok('labelled device without entities is listed',c._data().ign.length===2);c.hass=hass({states:s3,entities:e3,devices:d3,areas:{g:{name:'Garden'}},callWS:ws,user:{is_admin:true}});c._sig=null;c._draw();
+ c.setConfig({summary:true,standby_domains:[]});ok('standby_domains: [] keeps TVs in the red list',c._data().dev.some(x=>x.name==='TV'));
+ c.setConfig({summary:true});
+ const ib=c.shadowRoot.querySelector('.act[data-panel="dev"]');ok('admin sees the ignore button',!!ib);
+ ib.click();ok('ignore asks first',!!c.shadowRoot.querySelector('.ask')&&calls.every(m=>m.type!=='config/device_registry/update'));
+ c.shadowRoot.querySelector('.ask .yes').click();await wait(30);
+ const up=calls.find(m=>m.type==='config/device_registry/update');
+ ok('ignore creates the label and sets it',calls.some(m=>m.type==='config/label_registry/create'&&m.name==='fuori_monitoraggio')&&up&&up.device_id==='old'&&up.labels.includes('fuori_monitoraggio'));
+ c.shadowRoot.querySelector('[data-more="fign"]').click();const rb=c.shadowRoot.querySelector('.act[data-panel="ign"]');rb.click();c.shadowRoot.querySelector('.ask .yes').click();await wait(30);
+ const up2=calls.filter(m=>m.type==='config/device_registry/update').pop();ok('restore removes the label',up2.device_id==='ig'&&!up2.labels.includes('fuori_monitoraggio'));
+ const bad2=card({});bad2.hass=hass({states:s3,entities:e3,devices:d3,callWS:async m=>{if(m.type==='config_entries/get')return[];throw new Error('no')},user:{is_admin:true}});await wait(30);
+ bad2.shadowRoot.querySelector('.act[data-panel="dev"]').click();bad2.shadowRoot.querySelector('.ask .yes').click();await wait(30);ok('failed change shows an error',/could not be saved/.test(txt(bad2)));
+ c=card({});c.hass=hass({states:s3,entities:e3,devices:d3,user:{is_admin:false}});await wait(30);
+ ok('non-admin sees no buttons and no ignored list',!c.shadowRoot.querySelector('.act')&&!/Ignored/.test(txt(c)));
+ let thrown=false;try{document.createElement('homeray-issues-card').setConfig({grace:-1})}catch(e){thrown=true}ok('grace -1 rejected',thrown);
+ thrown=false;try{document.createElement('homeray-issues-card').setConfig({standby_domains:'media_player'})}catch(e){thrown=true}ok('standby_domains must be a list',thrown);
+ c=card({summary:true});c.hass=hass({language:'it',states:s3,entities:e3,devices:d3,areas:{g:{name:'Giardino'}}});await wait(30);
+ ok('Italian duration and longest',/Giardino · da 3 giorni/.test(txt(c))&&/Da più tempo: Porch/.test(txt(c)));
+ c=card({summary:true});c.hass=hass({language:'it',callWS:async()=>[{entry_id:'x',domain:'reolink',state:'setup_retry',title:'Cam'}]});await wait(30);ok('summary starts with a capital letter',/Un'integrazione è ferma/.test(txt(c)));
  return R});
 let fail=0;for(const [n,o] of res){console.log((o?'ok   ':'FAIL ')+n);if(!o)fail++}
 if(errs.length){console.log('page errors:',errs);fail++}
