@@ -2,7 +2,7 @@
 
 **An X-ray of your home in Home Assistant.** Homeray shows at a glance what is not working in your smart home: devices that stopped responding, integrations that failed, pending updates and low batteries. No configuration needed.
 
-[![hacs](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz/docs/faq/custom_repositories)
+[![hacs](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://hacs.xyz)
 [![release](https://img.shields.io/github/v/release/DarkBeccio/homeray-cards)](https://github.com/DarkBeccio/homeray-cards/releases)
 [![license](https://img.shields.io/github/license/DarkBeccio/homeray-cards)](LICENSE)
 [![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-PayPal-FFB547?logo=paypal&logoColor=white)](https://paypal.me/AndreaGuarducci1992)
@@ -24,9 +24,14 @@ Both cards follow the language of Home Assistant: English, or Italian when Home 
 
 ### HACS (recommended)
 
-1. HACS → three dots (top right) → **Custom repositories**.
-2. Repository: `https://github.com/DarkBeccio/homeray-cards`, type: **Dashboard**.
-3. Search for **Homeray**, download it and reload the page.
+Homeray is in the default HACS store.
+
+[![Open in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=DarkBeccio&repository=homeray-cards&category=plugin)
+
+1. Open **HACS** and search for **Homeray**.
+2. Open it, select **Download** and reload the page.
+
+If Homeray does not show up in the search, add it as a custom repository: HACS → three dots (top right) → **Custom repositories** → repository `https://github.com/DarkBeccio/homeray-cards`, type **Dashboard**. Then search again.
 
 ### Manual
 

@@ -2,6 +2,7 @@
 
 **La radiografia della tua casa in Home Assistant.** Homeray ti mostra a colpo d'occhio cosa non funziona nella tua casa intelligente: dispositivi che non rispondono, integrazioni ferme, aggiornamenti in attesa e batterie scariche. Non va configurato.
 
+[![hacs](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://hacs.xyz)
 [![Offrimi un caffè](https://img.shields.io/badge/Offrimi%20un%20caff%C3%A8-PayPal-FFB547?logo=paypal&logoColor=white)](https://paypal.me/AndreaGuarducci1992)
 
 🇬🇧 [Read in English](README.md)
@@ -21,9 +22,14 @@ Le card usano la lingua di Home Assistant: italiano se Home Assistant è in ital
 
 ### Con HACS (consigliata)
 
-1. HACS → tre puntini in alto a destra → **Repository personalizzati**.
-2. Repository: `https://github.com/DarkBeccio/homeray-cards`, tipo: **Dashboard**.
-3. Cerca **Homeray**, scaricalo e ricarica la pagina.
+Homeray è nello store predefinito di HACS.
+
+[![Apri in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=DarkBeccio&repository=homeray-cards&category=plugin)
+
+1. Apri **HACS** e cerca **Homeray**.
+2. Aprilo, scegli **Scarica** e ricarica la pagina.
+
+Se Homeray non compare nella ricerca, aggiungilo come repository personalizzato: HACS → tre puntini in alto a destra → **Repository personalizzati** → repository `https://github.com/DarkBeccio/homeray-cards`, tipo **Dashboard**. Poi cerca di nuovo.
 
 ### A mano
 
