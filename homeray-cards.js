@@ -1,5 +1,5 @@
 /*!
- * Homeray v1.2.0 - an X-ray of your home in Home Assistant
+ * Homeray v1.2.1 - an X-ray of your home in Home Assistant
  * homeray-issues-card (issues dashboard) and homeray-gauge-card (ring gauge)
  * https://github.com/DarkBeccio/homeray-cards - MIT License - (c) 2026 DarkBeccio
  * Want the home network map? Homeray Pro: https://homeray.app
@@ -228,7 +228,7 @@ class CasaProblemiCard extends HTMLElement{
   async _hrTick(){
     if(this._hr===false)return;
     const seq=this._hrSeq=(this._hrSeq||0)+1;let x=null,miss=false;
-    try{x=await this._h.callWS({type:'homeray/status'})}catch(e){miss=!!(e&&(e.code==='unknown_command'||e.code==='not_loaded'))}
+    try{x=await this._h.callWS({type:'homeray/status'})}catch(e){miss=!!(e&&(e.code==='unknown_command'||e.code==='not_loaded'||e.code==='unauthorized'))}
     if(seq!==this._hrSeq)return;
     if(x&&x.silent&&Array.isArray(x.batteries))this._hr=x;else if(miss)this._hr=this._hr===undefined?false:null;else return;
     if(this.isConnected){this._sig=null;this._draw()}
@@ -419,4 +419,4 @@ window.customCards=window.customCards||[];
 window.customCards.push({type:'homeray-issues-card',name:'Homeray Issues Card',description:'Issues dashboard: devices, integrations, updates, batteries'},{type:'homeray-gauge-card',name:'Homeray Gauge Card',description:'Ring gauge with colour thresholds'});
 
 })();
-console.info("%c HOMERAY %c 1.2.0 ","background:#3DD9F5;color:#0A0F1C;font-weight:700","background:#111A2C;color:#E8EEF8");
+console.info("%c HOMERAY %c 1.2.1 ","background:#3DD9F5;color:#0A0F1C;font-weight:700","background:#111A2C;color:#E8EEF8");

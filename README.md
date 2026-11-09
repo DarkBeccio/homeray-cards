@@ -36,8 +36,8 @@ If Homeray does not show up in the search, add it as a custom repository: HACS �
 ### Manual
 
 1. Download [`homeray-cards.js`](https://github.com/DarkBeccio/homeray-cards/raw/main/homeray-cards.js) and copy it to `/config/www/`.
-2. Settings → Dashboards → three dots → **Resources** → **Add resource**: URL `/local/homeray-cards.js?v=1.2.0`, type **JavaScript module**.
-3. Reload the page (Ctrl+Shift+R). The browser console shows `HOMERAY 1.2.0`.
+2. Settings → Dashboards → three dots → **Resources** → **Add resource**: URL `/local/homeray-cards.js?v=1.2.1`, type **JavaScript module**.
+3. Reload the page (Ctrl+Shift+R). The browser console shows `HOMERAY 1.2.1`.
 
 ## Issues card
 
@@ -68,7 +68,7 @@ Install the free [Homeray integration](https://github.com/DarkBeccio/homeray-int
 - a **Silent devices** panel: devices that still look available but have sent nothing for hours. This is how battery devices usually die, stuck on their last value and never marked unavailable;
 - a better battery list: low/medium/high sensors too, and battery sensors that stopped reporting; phones and home storage batteries are left out.
 
-Without the integration the card works as before.
+Without the integration the card works as before. The integration answers only administrators: other users see the card as it is without it.
 
 | | Home Assistant Maintenance dashboard | Homeray card | Homeray card + integration |
 | --- | --- | --- | --- |

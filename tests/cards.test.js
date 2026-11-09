@@ -104,6 +104,8 @@ const res=await p.evaluate(async()=>{
  c=card({});c.hass=hass({callWS:async m=>m.type==='homeray/status'?wait1:[]});await wait(30);ok('integration: explains the wait after a restart',/Starts 21 h after a restart/.test(txt(c)));
  let asked=0;c=card({});c.hass=hass({callWS:async m=>{if(m.type==='homeray/status'){asked++;const e=new Error('x');e.code='unknown_command';throw e}return[]}});await wait(30);await c._tick();
  ok('no integration: no silent panel, asked once',!/Silent devices/.test(txt(c))&&asked===1);
+ let asked2=0;c=card({});c.hass=hass({callWS:async m=>{if(m.type==='homeray/status'){asked2++;const e=new Error('Unauthorized');e.code='unauthorized';throw e}return[]}});await wait(30);await c._tick();
+ ok('non-admin user: no silent panel, asked once',!/Silent devices/.test(txt(c))&&asked2===1);
  c=card({});c.hass=hass({language:'it',callWS:hrWs,devices:{dz:{name:'Porta'}}});await wait(30);ok('integration: Italian texts',/Dispositivi muti/.test(txt(c))&&/muto da 30 ore/.test(txt(c)));
  return R});
 let fail=0;for(const [n,o] of res){console.log((o?'ok   ':'FAIL ')+n);if(!o)fail++}

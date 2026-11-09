@@ -34,8 +34,8 @@ Se Homeray non compare nella ricerca, aggiungilo come repository personalizzato:
 ### A mano
 
 1. Scarica [`homeray-cards.js`](https://github.com/DarkBeccio/homeray-cards/raw/main/homeray-cards.js) e copialo in `/config/www/`.
-2. Impostazioni → Dashboard → tre puntini → **Risorse** → **Aggiungi risorsa**: URL `/local/homeray-cards.js?v=1.2.0`, tipo **Modulo JavaScript**.
-3. Ricarica la pagina (Ctrl+Maiusc+R). Nella console del browser compare `HOMERAY 1.2.0`.
+2. Impostazioni → Dashboard → tre puntini → **Risorse** → **Aggiungi risorsa**: URL `/local/homeray-cards.js?v=1.2.1`, tipo **Modulo JavaScript**.
+3. Ricarica la pagina (Ctrl+Maiusc+R). Nella console del browser compare `HOMERAY 1.2.1`.
 
 ## Quadro dei problemi
 
@@ -66,7 +66,7 @@ Installa l'[integrazione Homeray](https://github.com/DarkBeccio/homeray-integrat
 - un riquadro **Dispositivi muti**: i dispositivi che risultano disponibili ma non mandano nulla da ore. È così che di solito muoiono i dispositivi a batteria, fermi sull'ultimo valore e mai segnati come non disponibili;
 - un elenco delle batterie più completo: anche i sensori basso/medio/alto e i sensori di batteria che hanno smesso di rispondere; telefoni e batterie di accumulo sono esclusi.
 
-Senza l'integrazione la card funziona come prima.
+Senza l'integrazione la card funziona come prima. L'integrazione risponde solo agli amministratori: gli altri utenti vedono la card come senza integrazione.
 
 | | Dashboard Manutenzione di Home Assistant | Card Homeray | Card Homeray + integrazione |
 | --- | --- | --- | --- |

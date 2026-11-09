@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1 - 2026-11-09
+
+- Issues card: the Homeray integration now answers only administrators. For other users the card works as it does without the integration and stops asking for it.
+
 ## 1.2.0 - 2026-11-09
 
 - Issues card: works with the new free [Homeray integration](https://github.com/DarkBeccio/homeray-integration). When it is installed the card adds a "Silent devices" panel (devices that look available but have sent nothing for hours) and uses its battery list, which also covers low/medium/high sensors and battery sensors that stopped reporting, and leaves out phones and home storage batteries. Silent devices count in the summary and can be ignored like the others.
