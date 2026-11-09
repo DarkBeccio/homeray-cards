@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0 - 2026-11-09
+
+- Issues card: works with the new free [Homeray integration](https://github.com/DarkBeccio/homeray-integration). When it is installed the card adds a "Silent devices" panel (devices that look available but have sent nothing for hours) and uses its battery list, which also covers low/medium/high sensors and battery sensors that stopped reporting, and leaves out phones and home storage batteries. Silent devices count in the summary and can be ignored like the others.
+- Without the integration nothing changes; the card asks for it once and then stops.
+- README: comparison with the Maintenance dashboard of Home Assistant 2026.5.
+
 ## 1.1.0 - 2026-11-01
 
 - Issues card: every device shows how long it has been unreachable ("for 3 days"), and the oldest outages come first.

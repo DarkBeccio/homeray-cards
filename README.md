@@ -36,8 +36,8 @@ If Homeray does not show up in the search, add it as a custom repository: HACS �
 ### Manual
 
 1. Download [`homeray-cards.js`](https://github.com/DarkBeccio/homeray-cards/raw/main/homeray-cards.js) and copy it to `/config/www/`.
-2. Settings → Dashboards → three dots → **Resources** → **Add resource**: URL `/local/homeray-cards.js?v=1.1.0`, type **JavaScript module**.
-3. Reload the page (Ctrl+Shift+R). The browser console shows `HOMERAY 1.1.0`.
+2. Settings → Dashboards → three dots → **Resources** → **Add resource**: URL `/local/homeray-cards.js?v=1.2.0`, type **JavaScript module**.
+3. Reload the page (Ctrl+Shift+R). The browser console shows `HOMERAY 1.2.0`.
 
 ## Issues card
 
@@ -60,6 +60,25 @@ dark: true
 A device counts as "not responding" when at least one of its entities is unavailable and none of the others reports a real state (they are all unavailable or unknown). This is an estimate based on the entities, not a direct connectivity test. Each row shows how long the device has been unreachable, and the oldest outages come first; the time counts from the last change Home Assistant saw, so a restart starts it again. Low batteries include battery sensors below the threshold and binary battery sensors that report "low"; a device listed with its percentage is not counted twice. If the integrations cannot be read, the card says so instead of showing "All good".
 
 **Stop monitoring a device.** Administrators see an eye button on each row: tap it, confirm, and the device gets the `exclude_label` label (the label is created if it does not exist yet). To monitor it again, open the folded "Ignored" list at the bottom. You can also add the label by hand in Settings → Devices. Non-administrators see no buttons.
+
+### With the Homeray integration
+
+Install the free [Homeray integration](https://github.com/DarkBeccio/homeray-integration) and the card finds it by itself, with no new options:
+
+- a **Silent devices** panel: devices that still look available but have sent nothing for hours. This is how battery devices usually die, stuck on their last value and never marked unavailable;
+- a better battery list: low/medium/high sensors too, and battery sensors that stopped reporting; phones and home storage batteries are left out.
+
+Without the integration the card works as before.
+
+| | Home Assistant Maintenance dashboard | Homeray card | Homeray card + integration |
+| --- | --- | --- | --- |
+| Unavailable devices and low batteries | ✓ | ✓ | ✓ |
+| How long each device has been down | | ✓ | ✓ |
+| Stopped integrations and pending updates on the same page | | ✓ | ✓ |
+| TVs in standby kept apart, short drops ignored | | ✓ | ✓ |
+| Stop monitoring a device from the card | | ✓ | ✓ |
+| Devices that died without becoming unavailable | | | ✓ |
+| Low/medium/high battery sensors, no phones or home storage | | | ✓ |
 
 ## Gauge card
 
@@ -89,7 +108,7 @@ Four gauges of 3 columns fit on one row.
 
 ## Homeray Pro
 
-Want to see your whole home network, floor by floor? **Homeray Pro** adds the home map: your house drawn as a cross-section, with every router, switch and access point in its room, real cables and powerline links, live status and a detail sheet for each device. It draws itself from a short list of floors and connections.
+Want to see your whole home network, floor by floor? **Homeray Pro** adds the home map: your house drawn as a cross-section, with every router, switch and access point in its room, real cables and powerline links, live status and a detail sheet for each device. With the free Homeray integration it draws itself from your Home Assistant floors, rooms and network devices; you can also describe it with a short list.
 
 ![Homeray Pro home map](images/homeray-pro-map.png)
 

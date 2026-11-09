@@ -34,8 +34,8 @@ Se Homeray non compare nella ricerca, aggiungilo come repository personalizzato:
 ### A mano
 
 1. Scarica [`homeray-cards.js`](https://github.com/DarkBeccio/homeray-cards/raw/main/homeray-cards.js) e copialo in `/config/www/`.
-2. Impostazioni → Dashboard → tre puntini → **Risorse** → **Aggiungi risorsa**: URL `/local/homeray-cards.js?v=1.1.0`, tipo **Modulo JavaScript**.
-3. Ricarica la pagina (Ctrl+Maiusc+R). Nella console del browser compare `HOMERAY 1.1.0`.
+2. Impostazioni → Dashboard → tre puntini → **Risorse** → **Aggiungi risorsa**: URL `/local/homeray-cards.js?v=1.2.0`, tipo **Modulo JavaScript**.
+3. Ricarica la pagina (Ctrl+Maiusc+R). Nella console del browser compare `HOMERAY 1.2.0`.
 
 ## Quadro dei problemi
 
@@ -58,6 +58,25 @@ dark: true
 Un dispositivo risulta "non risponde" quando almeno una sua entità è non disponibile e nessun'altra ha uno stato reale (sono tutte non disponibili o sconosciute). È una stima basata sulle entità, non una verifica diretta della connessione. Ogni riga dice da quanto tempo il dispositivo non risponde, e le cadute più vecchie vengono per prime; il tempo parte dall'ultimo cambio di stato visto da Home Assistant, quindi un riavvio lo azzera. Tra le batterie scariche ci sono i sensori di batteria sotto soglia e i sensori binari di batteria che segnalano "scarica"; un dispositivo già elencato con la percentuale non viene contato due volte. Se le integrazioni non si possono leggere, la card lo dice invece di mostrare "Tutto a posto".
 
 **Smettere di monitorare un dispositivo.** Gli amministratori vedono un pulsante a forma di occhio su ogni riga: lo tocchi, confermi, e il dispositivo riceve l'etichetta `exclude_label` (se l'etichetta non esiste, viene creata). Per rimetterlo sotto controllo, apri l'elenco "Non monitorati" in fondo. L'etichetta si può anche aggiungere a mano da Impostazioni → Dispositivi. Chi non è amministratore non vede i pulsanti.
+
+### Con l'integrazione Homeray
+
+Installa l'[integrazione Homeray](https://github.com/DarkBeccio/homeray-integration), gratuita, e la card la trova da sola, senza nuove opzioni:
+
+- un riquadro **Dispositivi muti**: i dispositivi che risultano disponibili ma non mandano nulla da ore. È così che di solito muoiono i dispositivi a batteria, fermi sull'ultimo valore e mai segnati come non disponibili;
+- un elenco delle batterie più completo: anche i sensori basso/medio/alto e i sensori di batteria che hanno smesso di rispondere; telefoni e batterie di accumulo sono esclusi.
+
+Senza l'integrazione la card funziona come prima.
+
+| | Dashboard Manutenzione di Home Assistant | Card Homeray | Card Homeray + integrazione |
+| --- | --- | --- | --- |
+| Dispositivi non disponibili e batterie scariche | ✓ | ✓ | ✓ |
+| Da quanto tempo ogni dispositivo è giù | | ✓ | ✓ |
+| Integrazioni ferme e aggiornamenti nella stessa pagina | | ✓ | ✓ |
+| TV in standby a parte, cadute brevi ignorate | | ✓ | ✓ |
+| Smettere di monitorare un dispositivo dalla card | | ✓ | ✓ |
+| Dispositivi morti senza diventare non disponibili | | | ✓ |
+| Batterie basso/medio/alto, senza telefoni e accumuli | | | ✓ |
 
 ## Indicatore ad anello
 
@@ -87,7 +106,7 @@ Quattro anelli da 3 colonne stanno su una riga.
 
 ## Homeray Pro
 
-Vuoi vedere tutta la rete di casa, piano per piano? **Homeray Pro** aggiunge la mappa della casa: l'edificio disegnato a spaccato, con router, switch e access point nella loro stanza, i cavi e le powerline, lo stato in tempo reale e la scheda di ogni apparato. Si disegna da sola a partire dall'elenco dei piani e dei collegamenti.
+Vuoi vedere tutta la rete di casa, piano per piano? **Homeray Pro** aggiunge la mappa della casa: l'edificio disegnato a spaccato, con router, switch e access point nella loro stanza, i cavi e le powerline, lo stato in tempo reale e la scheda di ogni apparato. Con l'integrazione Homeray, gratuita, si disegna da sola partendo da piani, stanze e apparati di rete di Home Assistant; in alternativa basta un breve elenco.
 
 ![Mappa della casa di Homeray Pro](images/homeray-pro-map-it.png)
 

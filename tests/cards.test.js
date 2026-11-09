@@ -22,7 +22,7 @@ const res=await p.evaluate(async()=>{
  // setConfig keeps entries
  c.setConfig({rows:3});ok('setConfig keeps integration errors',/Mqtt/.test(txt(c)));
  // out-of-order answers
- let res=[];c=card({});c._h=hass({callWS:()=>new Promise(r=>res.push(r))});const a=c._tick(),bb=c._tick();
+ let res=[];c=card({});c._h=hass({callWS:m=>m.type==='homeray/status'?Promise.reject(1):new Promise(r=>res.push(r))});const a=c._tick(),bb=c._tick();
  res[1]([{domain:'mqtt',state:'setup_error',title:'MQTT'}]);await bb;res[0]([]);await a;c._draw();
  ok('late older answer is ignored',/Mqtt/.test(txt(c)));
  // batteries
@@ -90,6 +90,21 @@ const res=await p.evaluate(async()=>{
  c=card({summary:true});c.hass=hass({language:'it',states:s3,entities:e3,devices:d3,areas:{g:{name:'Giardino'}}});await wait(30);
  ok('Italian duration and longest',/Giardino · da 3 giorni/.test(txt(c))&&/Da più tempo: Porch/.test(txt(c)));
  c=card({summary:true});c.hass=hass({language:'it',callWS:async()=>[{entry_id:'x',domain:'reolink',state:'setup_retry',title:'Cam'}]});await wait(30);ok('summary starts with a capital letter',/Un'integrazione è ferma/.test(txt(c)));
+ // 1.2.0: Homeray integration
+ const T1=Date.now(),hrSt={silent:{ready:true,ready_in_hours:0,hours:24,devices:[{device_id:'dz',name:'Door',model:'Z1',last_reported:new Date(T1-30*3600e3).toISOString(),hours:30},{device_id:'ig',name:'Ign',model:'',last_reported:new Date(T1-30*3600e3).toISOString(),hours:30}]},
+  batteries:[{entity_id:'sensor.scale',device_id:'sc',name:'Scale battery',kind:'low',level:null},{entity_id:'sensor.lock',device_id:'lk',name:'Lock battery',kind:'level',level:9},{entity_id:'sensor.th',device_id:'th',name:'Thermo battery',kind:'unavailable',level:null}]};
+ const hrWs=async m=>m.type==='homeray/status'?hrSt:[];
+ c=card({summary:true});c.hass=hass({states:{'sensor.d_pct':{state:'5',attributes:{device_class:'battery',friendly_name:'Old way'}}},devices:{dz:{name:'Door',area_id:'g'},ig:{name:'Ign',labels:['fuori_monitoraggio']}},areas:{g:{name:'Garden'}},callWS:hrWs});await wait(30);
+ dd=c._data();
+ ok('integration: silent panel lists the device',dd.sil&&dd.sil.length===1&&/Silent devices/.test(txt(c))&&/Garden · nothing for 30 h/.test(txt(c)));
+ ok('integration: excluded device not silent',!dd.sil.some(x=>x.name==='Ign'));
+ ok('integration: its batteries replace the old list',dd.bat.length===3&&!dd.bat.some(x=>x.name==='Old way')&&/not reporting/.test(txt(c))&&/9%/.test(txt(c)));
+ ok('integration: silent counts in the summary',/4 things to check/.test(txt(c))&&/1 silent/.test(txt(c)));
+ const wait1={silent:{ready:false,ready_in_hours:20.2,hours:24,devices:[]},batteries:[]};
+ c=card({});c.hass=hass({callWS:async m=>m.type==='homeray/status'?wait1:[]});await wait(30);ok('integration: explains the wait after a restart',/Starts 21 h after a restart/.test(txt(c)));
+ let asked=0;c=card({});c.hass=hass({callWS:async m=>{if(m.type==='homeray/status'){asked++;const e=new Error('x');e.code='unknown_command';throw e}return[]}});await wait(30);await c._tick();
+ ok('no integration: no silent panel, asked once',!/Silent devices/.test(txt(c))&&asked===1);
+ c=card({});c.hass=hass({language:'it',callWS:hrWs,devices:{dz:{name:'Porta'}}});await wait(30);ok('integration: Italian texts',/Dispositivi muti/.test(txt(c))&&/muto da 30 ore/.test(txt(c)));
  return R});
 let fail=0;for(const [n,o] of res){console.log((o?'ok   ':'FAIL ')+n);if(!o)fail++}
 if(errs.length){console.log('page errors:',errs);fail++}
