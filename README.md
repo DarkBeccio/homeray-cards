@@ -24,7 +24,7 @@ Both cards follow the language of Home Assistant: English, or Italian when Home 
 
 ### HACS (recommended)
 
-Homeray is in the default HACS store.
+Homeray is in the default HACS store. In Home Assistant 2026.11 and newer HACS is built in as the **Marketplace** (Settings → Marketplace): the steps are the same.
 
 [![Open in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=DarkBeccio&repository=homeray-cards&category=plugin)
 
@@ -63,7 +63,7 @@ A device counts as "not responding" when at least one of its entities is unavail
 
 ### With the Homeray integration
 
-Install the free [Homeray integration](https://github.com/DarkBeccio/homeray-integration) and the card finds it by itself, with no new options:
+Install the free [Homeray integration](https://github.com/DarkBeccio/homeray-integration) (Marketplace → Add from link, or HACS custom repository) and the card finds it by itself, with no new options:
 
 - a **Silent devices** panel: devices that still look available but have sent nothing for hours. This is how battery devices usually die, stuck on their last value and never marked unavailable;
 - a better battery list: low/medium/high sensors too, and battery sensors that stopped reporting; phones and home storage batteries are left out.

@@ -22,7 +22,7 @@ Le card usano la lingua di Home Assistant: italiano se Home Assistant è in ital
 
 ### Con HACS (consigliata)
 
-Homeray è nello store predefinito di HACS.
+Homeray è nello store predefinito di HACS. In Home Assistant 2026.11 e successivi HACS è integrato come **Marketplace** (Impostazioni → Marketplace): i passi sono gli stessi.
 
 [![Apri in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=DarkBeccio&repository=homeray-cards&category=plugin)
 
@@ -61,7 +61,7 @@ Un dispositivo risulta "non risponde" quando almeno una sua entità è non dispo
 
 ### Con l'integrazione Homeray
 
-Installa l'[integrazione Homeray](https://github.com/DarkBeccio/homeray-integration), gratuita, e la card la trova da sola, senza nuove opzioni:
+Installa l'[integrazione Homeray](https://github.com/DarkBeccio/homeray-integration), gratuita (Marketplace → Aggiungi dal collegamento, oppure repository personalizzato di HACS), e la card la trova da sola, senza nuove opzioni:
 
 - un riquadro **Dispositivi muti**: i dispositivi che risultano disponibili ma non mandano nulla da ore. È così che di solito muoiono i dispositivi a batteria, fermi sull'ultimo valore e mai segnati come non disponibili;
 - un elenco delle batterie più completo: anche i sensori basso/medio/alto e i sensori di batteria che hanno smesso di rispondere; telefoni e batterie di accumulo sono esclusi.
